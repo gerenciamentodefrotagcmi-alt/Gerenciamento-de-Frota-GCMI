@@ -1012,3 +1012,8 @@ body {
 @media (max-width: 480px) {
   .cards-grid.five { grid-template-columns: 1fr !important; }
 }
+/* Cadastros de responsáveis: nomes legíveis e ações em linha própria. */
+#inspetoresCoordenacaoForm, #gerentesAbastecimentoForm { grid-template-columns: repeat(2,minmax(0,1fr)); }
+#inspetoresCoordenacaoForm > .field:first-of-type, #gerentesAbastecimentoForm > .field:first-of-type,
+#inspetoresCoordenacaoForm > .full, #gerentesAbastecimentoForm > .full { grid-column: 1 / -1; }
+#inspetoresCoordenacaoForm .actions-row, #gerentesAbastecimentoForm .actions-row { display:flex; flex-wrap:wrap; gap:8px; }

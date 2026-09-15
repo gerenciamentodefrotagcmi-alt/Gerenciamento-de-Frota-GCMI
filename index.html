@@ -1012,6 +1012,19 @@
 
       <!-- ════════════ CADASTROS ════════════ -->
       <section id="cadastros" class="screen">
+<p>Cadastre os responsáveis pelas funções abaixo. Inativar ou editar um cadastro preserva os nomes dos abastecimentos anteriores.</p><div class="cards-grid two"><article class="panel"><div class="panel-head panel-head-sticky"><h3>Inspetores em coordenação</h3></div>
+<form id="inspetoresCoordenacaoForm" class="form-grid compact-grid"><input type="hidden" name="id">
+<div class="field"><label for="inspetoresCoordenacaoNome">Nome</label><input id="inspetoresCoordenacaoNome" name="nome" required maxlength="120"></div>
+<div class="field"><label for="inspetoresCoordenacaoMatricula">Matrícula (opcional)</label><input id="inspetoresCoordenacaoMatricula" name="matricula" maxlength="30"></div>
+<div class="field"><label for="inspetoresCoordenacaoAtivo">Status</label><select id="inspetoresCoordenacaoAtivo" name="ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+<div class="actions-row full"><button type="submit" class="btn btn-primary">Salvar cadastro</button><button type="reset" class="btn btn-secondary">Novo / cancelar edição</button></div><p id="inspetoresCoordenacaoStatus" role="status" class="full"></p></form>
+<div class="table-wrap compact"><table><thead><tr><th>Nome</th><th>Matrícula</th><th>Status</th><th>Ações</th></tr></thead><tbody id="inspetoresCoordenacaoTabela"></tbody></table></div></article><article class="panel"><div class="panel-head panel-head-sticky"><h3>Gerentes de Abastecimento</h3></div>
+<form id="gerentesAbastecimentoForm" class="form-grid compact-grid"><input type="hidden" name="id">
+<div class="field"><label for="gerentesAbastecimentoNome">Nome</label><input id="gerentesAbastecimentoNome" name="nome" required maxlength="120"></div>
+<div class="field"><label for="gerentesAbastecimentoMatricula">Matrícula (opcional)</label><input id="gerentesAbastecimentoMatricula" name="matricula" maxlength="30"></div>
+<div class="field"><label for="gerentesAbastecimentoAtivo">Status</label><select id="gerentesAbastecimentoAtivo" name="ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+<div class="actions-row full"><button type="submit" class="btn btn-primary">Salvar cadastro</button><button type="reset" class="btn btn-secondary">Novo / cancelar edição</button></div><p id="gerentesAbastecimentoStatus" role="status" class="full"></p></form>
+<div class="table-wrap compact"><table><thead><tr><th>Nome</th><th>Matrícula</th><th>Status</th><th>Ações</th></tr></thead><tbody id="gerentesAbastecimentoTabela"></tbody></table></div></article></div>
         <div class="cards-grid two">
           <article class="panel">
             <div class="panel-head panel-head-sticky"><h3>Cadastro de veículos</h3></div>

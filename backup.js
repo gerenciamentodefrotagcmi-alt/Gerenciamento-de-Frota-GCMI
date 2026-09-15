@@ -22,6 +22,7 @@ window.FleetBackup=(()=>{
   if(data.trocasOleo==null)data.trocasOleo=[];
   if(data.tiposPrefixo==null)data.tiposPrefixo=['Vtr','MP'];
   const cols=['perfis','usuarios','combustiveis','setores','motoristas','veiculos','abastecimentos','trocasOleo'];
+  for(const k of ['inspetoresCoordenacao','gerentesAbastecimento'])if(data[k]!=null)cols.push(k);
   const ids={};
   for(const k of cols){
    if(!Array.isArray(data[k]))throw Error('Coleção inválida: '+k);

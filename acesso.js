@@ -56,7 +56,7 @@ window.Cloud = (()=>{
       perfil=p;ready=true;lastActivity=Date.now();
       q('#identidadeSessao').textContent=data.user.email+' · '+perfil;
       q('#administrarAcesso').hidden=perfil!=='administrador';
-      await loadScript('./db-remoto.js');await loadScript('./app.js');await window.iniciarAplicacao();
+      await loadScript('./db-remoto.js');await loadScript('./app.js');await loadScript('./responsaveis.js');await window.iniciarAplicacao();
       document.body.classList.add('autenticado');q('#acesso').hidden=true;
       permissions();
       client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'&&ready)void logout('Sessão encerrada.');});
