@@ -31,7 +31,7 @@ window.Cloud = (()=>{
       const {data,error}=await client.rpc(name,args);
       if(error){if(error.code==='42501' && !closing) await logout('Sua sessão ou permissão não é mais válida.');throw new Error(error.message||'Operação não concluída.');}
       return data;
-    }finally{if(writing){busy--;const el=q('#gravandoNuvem');if(el)el.hidden=busy>0;}}
+    }finally{if(writing){busy--;const el=q('#gravandoNuvem');if(el)el.hidden=busy===0;}}
   }
   function fail(error){
     if(closing)return;
