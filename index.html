@@ -569,6 +569,55 @@
   </style>
 <link rel="stylesheet" href="./interface.css" />
 <link rel="stylesheet" href="./acesso.css">
+<style id="armGaugeCss">
+*{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",system-ui,Arial,sans-serif;background:#0a0e14;padding:30px;display:flex;justify-content:center}
+  /* ======= MEDIDOR DE ARMAZENAMENTO (prefixo arm-) ======= */
+  #armGauge{position:relative;width:100%;max-width:1040px;margin:0 auto 14px;border-radius:18px;overflow:hidden;padding:20px 30px 20px;
+    background:linear-gradient(90deg,rgba(255,255,255,.015) 0 2px,rgba(0,0,0,0) 2px 5px),linear-gradient(180deg,#365d82 0%,#2a4a6c 9%,#203c59 34%,#172d45 66%,#102134 100%);
+    box-shadow:0 36px 70px rgba(0,0,0,.6),0 8px 16px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 6px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.4)}
+  #armGauge .arm-top{content:"";position:absolute;left:0;right:0;top:0;height:46%;pointer-events:none;
+    background:linear-gradient(180deg,rgba(210,230,250,.2),rgba(210,230,250,.05) 55%,rgba(210,230,250,0));border-radius:18px 18px 60% 60%/18px 18px 30% 30%}
+  #armGauge .arm-edge{position:absolute;inset:6px;border-radius:13px;pointer-events:none;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+  #armGauge .arm-inner{position:relative;z-index:2}
+  #armGauge .arm-title{text-align:center;margin:2px 0}
+  #armGauge .arm-t1{font-size:29px;font-weight:800;letter-spacing:.34em;color:#efe4c7;text-shadow:0 1px 2px rgba(0,0,0,.6),0 0 20px rgba(255,255,255,.12);padding-left:.34em}
+  #armGauge .arm-t2{font-size:11.5px;font-weight:700;letter-spacing:.42em;color:#d9b45f;margin-top:4px;padding-left:.42em;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+  #armGauge .arm-scale{position:relative;height:60px;margin:12px 6px 6px}
+  #armGauge .arm-nums{position:relative;height:17px}
+  #armGauge .arm-num{position:absolute;transform:translateX(-50%);font-size:14px;font-weight:800;color:#eadfc4;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+  #armGauge .arm-bar{position:absolute;left:0;right:0;top:28px;height:9px;border-radius:5px;
+    background:linear-gradient(90deg,#39d06a 0%,#79d156 7%,#c7d24c 18%,#e7cb49 34%,#eac048 62%,#eab948 100%);
+    box-shadow:0 0 10px rgba(233,200,80,.35),inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 3px rgba(0,0,0,.4)}
+  #armGauge .arm-ticks{position:absolute;left:0;right:0;top:20px;height:12px}
+  #armGauge .arm-tk{position:absolute;top:0;width:1px;height:6px;background:rgba(10,20,30,.55)}
+  #armGauge .arm-tk.arm-mj{height:11px;width:2px;background:rgba(10,20,30,.8)}
+  #armGauge .arm-needle{position:absolute;top:16px;width:4px;height:33px;transform:translateX(-50%);border-radius:2px;
+    background:linear-gradient(180deg,#fffef5,#f3e2a0 45%,#b98e34);box-shadow:0 0 12px rgba(255,245,200,1),0 0 22px rgba(240,205,120,.7),0 2px 4px rgba(0,0,0,.5)}
+  #armGauge .arm-needle::before{content:"";position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%,#fffdf2,#e9c36a 60%,#9c7730);box-shadow:0 0 10px rgba(255,240,190,.9),0 1px 3px rgba(0,0,0,.6)}
+  #armGauge .arm-lcd{position:relative;width:200px;margin:2px auto 0;border-radius:9px;padding:8px 14px 7px;
+    background:linear-gradient(180deg,#c9cdae,#b4b994 60%,#a7ac86);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.45),inset 0 -1px 0 rgba(255,255,255,.3),0 2px 4px rgba(0,0,0,.5),0 0 0 2px rgba(0,0,0,.35),0 0 0 3px rgba(255,255,255,.08)}
+  #armGauge .arm-pct{font-family:"Consolas","Courier New",monospace;font-size:29px;font-weight:700;letter-spacing:.08em;color:#2b3a1f;text-align:center;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.25)}
+  #armGauge .arm-mb{font-family:"Consolas","Courier New",monospace;font-size:11.5px;letter-spacing:.14em;color:#3a4a28;text-align:center;margin-top:3px}
+  #armGauge .arm-dot{position:absolute;right:10px;top:11px;width:8px;height:8px;border-radius:50%;background:#49e06a;box-shadow:0 0 7px #49e06a}
+  #armGauge .arm-btns{position:absolute;right:9px;bottom:9px;display:flex;flex-direction:column;gap:3px}
+  #armGauge .arm-btns i{width:7px;height:3px;border-radius:1px;background:#5b6347;display:block}
+  #armGauge .arm-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 6px 6px}
+  #armGauge .arm-card{display:flex;align-items:center;gap:12px;border:1.5px solid rgba(233,197,112,.55);border-radius:12px;padding:11px 14px;
+    background:linear-gradient(180deg,rgba(10,22,36,.5),rgba(6,14,24,.66));box-shadow:inset 0 1px 0 rgba(255,236,172,.22),inset 0 -3px 8px rgba(0,0,0,.4),0 2px 5px rgba(0,0,0,.4)}
+  #armGauge .arm-card svg{width:34px;height:34px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+  #armGauge .arm-lab{font-size:9.5px;color:#d9c48c;text-transform:uppercase;letter-spacing:.05em;line-height:1.2;font-weight:700}
+  #armGauge .arm-val{font-size:22px;color:#f3e2a0;font-weight:800;font-family:"Consolas","Courier New",monospace;margin-top:3px;text-shadow:0 1px 1px rgba(0,0,0,.6),0 0 9px rgba(233,197,112,.4)}
+  #armGauge .arm-brand{text-align:center;font-size:11px;letter-spacing:.3em;color:#9fb4cf;font-weight:600;margin-top:10px;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+  #armGauge .arm-toggle{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;user-select:none;z-index:3}
+  #armGauge .arm-slot{width:46px;height:22px;border-radius:12px;position:relative;background:linear-gradient(180deg,#0e1b2b,#1a2d45);box-shadow:inset 0 2px 4px rgba(0,0,0,.8),inset 0 -1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,255,255,.1)}
+  #armGauge .arm-knob{position:absolute;left:3px;top:2.5px;width:17px;height:17px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffff,#c3ccd8 55%,#7f8a99);box-shadow:0 2px 4px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.9);transition:left .2s}
+  #armGauge .arm-toggle:hover .arm-knob,#armGauge .arm-toggle.on .arm-knob{left:26px}
+  #armGauge .arm-lab2{font-size:10px;font-weight:700;letter-spacing:.14em;color:#d9b45f;text-shadow:0 1px 1px rgba(0,0,0,.6)}
+  .arm-ok{text-align:center;color:#58d07a;font-size:12px;margin-top:8px;min-height:14px;font-weight:600}
+</style>
 </head>
 <body>
 <section id="acesso" aria-label="Acesso ao sistema">
@@ -1098,6 +1147,23 @@
   </div>
   <div class="support-frame">
     <article id="apoio-backup" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-backup" tabindex="0">
+<section id="armGauge" class="arm-panel" hidden>
+  <div class="arm-top"></div><div class="arm-edge"></div>
+  <div class="arm-inner">
+    <div class="arm-title"><div class="arm-t1">ARMAZENAMENTO</div><div class="arm-t2">NÍVEL · SUPABASE</div></div>
+    <div class="arm-scale"><div class="arm-nums" id="armNums"></div><div class="arm-bar"></div><div class="arm-ticks" id="armTicks"></div><div class="arm-needle" id="armNeedle"></div></div>
+    <div class="arm-lcd"><div class="arm-dot" id="armDot"></div><div class="arm-pct" id="armPct">046%</div><div class="arm-mb" id="armMb">210 MB / 500 MB</div><div class="arm-btns"><i></i><i></i></div></div>
+    <div class="arm-cards">
+      <div class="arm-card"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7" ry="2.6" fill="rgba(233,197,112,.16)"/><path d="M5 5.5v13c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-13"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg><div><div class="arm-lab">Banco<br>(total)</div><div class="arm-val" id="armBanco">210 MB</div></div></div>
+      <div class="arm-card"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3" width="12" height="15" rx="1.5" fill="rgba(233,197,112,.16)"/><rect x="6.5" y="5.5" width="12" height="15" rx="1.5" fill="#0c1826"/><path d="M9 10.3h7M9 13.1h7M9 15.9h4"/><circle cx="17.4" cy="17.2" r="3.3" fill="#0c1826"/><path d="M16 17.3l1 1 1.9-2.1"/></svg><div><div class="arm-lab">Comprovantes<br>ativos</div><div class="arm-val" id="armAtivos">665</div></div></div>
+      <div class="arm-card"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="4.2" rx="1" fill="rgba(233,197,112,.16)"/><path d="M5 9.2v9.3c0 .9.7 1.6 1.6 1.6h10.8c.9 0 1.6-.7 1.6-1.6V9.2"/><path d="M9.6 12.6h4.8"/></svg><div><div class="arm-lab">Comprovantes<br>arquivados</div><div class="arm-val" id="armArq">0</div></div></div>
+    </div>
+    <div class="arm-brand">GCMI · GERENCIAMENTO DE FROTA</div>
+  </div>
+  <div class="arm-toggle" id="armToggle"><div class="arm-slot"><div class="arm-knob"></div></div><div class="arm-lab2">ATUALIZAR</div></div>
+</section>
+<div class="arm-ok" id="armOk"></div>
+
       <div class="support-heading"><div><span class="eyebrow">SEUS DADOS</span><h3>Backup e restauração</h3></div><span class="status-label">Armazenamento autenticado</span></div>
       <p>Exporte todos os cadastros, abastecimentos, trocas de óleo e comprovantes ativos, independentemente dos filtros. Use o arquivo JSON para restaurar a base em uma conta administradora.</p>
       <div class="support-cards">
