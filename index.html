@@ -377,7 +377,7 @@
     @media (min-width:861px){
       .app-shell{ height:100vh; overflow:hidden; gap:16px !important; }
       /* esquerda: moldura COMPACTA (encolhe ao conteúdo, não estica); direita: moldura alta com a lista rolando */
-      .sidebar{ align-self:start !important; max-height:100%; overflow:hidden; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
+      .sidebar{ overflow:hidden; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
       .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden;
         margin-left:0 !important; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
       .main-content > .topbar{ flex:0 0 auto; }
@@ -398,6 +398,12 @@
       #dashboard.screen.active > .dash-tabs, #abastecimentos.screen.active > .dash-tabs{ flex:1 1 auto; min-height:0; }
       #dashboard .dash-tabs > .dash-pane:not([hidden]), #abastecimentos .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
       #dashboard .dash-scroll, #abastecimentos .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
+      /* Cadastros em abas: cada aba preenche a tela, tabela rola na caixa (sem rolar a página) */
+      #cadastros.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; padding-right:0 !important; }
+      #cadastros > .dash-tabs{ flex:1 1 auto; min-height:0; }
+      #cadastros .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+      #cadastros .dash-pane > .panel{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+      #cadastros .panel .table-wrap{ flex:1 1 auto; min-height:0; max-height:none !important; }
     }
     .table-inner { width:100%; border-collapse:collapse; }
 
@@ -685,7 +691,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.21</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.22</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1127,21 +1133,9 @@
 
       <!-- ════════════ CADASTROS ════════════ -->
       <section id="cadastros" class="screen">
-<p>Cadastre os responsáveis pelas funções abaixo. Inativar ou editar um cadastro preserva os nomes dos abastecimentos anteriores.</p><div class="cards-grid two"><article class="panel"><div class="panel-head panel-head-sticky"><h3>Inspetores em coordenação</h3></div>
-<form id="inspetoresCoordenacaoForm" class="form-grid compact-grid"><input type="hidden" name="id">
-<div class="field"><label for="inspetoresCoordenacaoNome">Nome</label><input id="inspetoresCoordenacaoNome" name="nome" required maxlength="120"></div>
-<div class="field"><label for="inspetoresCoordenacaoMatricula">Matrícula (opcional)</label><input id="inspetoresCoordenacaoMatricula" name="matricula" maxlength="30"></div>
-<div class="field"><label for="inspetoresCoordenacaoAtivo">Status</label><select id="inspetoresCoordenacaoAtivo" name="ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
-<div class="actions-row full"><button type="submit" class="btn btn-primary">Salvar cadastro</button><button type="reset" class="btn btn-secondary">Novo / cancelar edição</button></div><p id="inspetoresCoordenacaoStatus" role="status" class="full"></p></form>
-<div class="table-wrap compact"><table><thead><tr><th>Nome</th><th>Matrícula</th><th>Status</th><th>Ações</th></tr></thead><tbody id="inspetoresCoordenacaoTabela"></tbody></table></div></article><article class="panel"><div class="panel-head panel-head-sticky"><h3>Gerentes de Abastecimento</h3></div>
-<form id="gerentesAbastecimentoForm" class="form-grid compact-grid"><input type="hidden" name="id">
-<div class="field"><label for="gerentesAbastecimentoNome">Nome</label><input id="gerentesAbastecimentoNome" name="nome" required maxlength="120"></div>
-<div class="field"><label for="gerentesAbastecimentoMatricula">Matrícula (opcional)</label><input id="gerentesAbastecimentoMatricula" name="matricula" maxlength="30"></div>
-<div class="field"><label for="gerentesAbastecimentoAtivo">Status</label><select id="gerentesAbastecimentoAtivo" name="ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
-<div class="actions-row full"><button type="submit" class="btn btn-primary">Salvar cadastro</button><button type="reset" class="btn btn-secondary">Novo / cancelar edição</button></div><p id="gerentesAbastecimentoStatus" role="status" class="full"></p></form>
-<div class="table-wrap compact"><table><thead><tr><th>Nome</th><th>Matrícula</th><th>Status</th><th>Ações</th></tr></thead><tbody id="gerentesAbastecimentoTabela"></tbody></table></div></article></div>
-        <div class="cards-grid two">
-          <article class="panel">
+        <div class="dash-tabs cadastros-tabs" id="cadastrosTabs">
+          <div class="dash-tabbar" role="tablist"><button type="button" class="active" data-cad-tab="veiculos">🚓 Veículos</button><button type="button" data-cad-tab="motoristas">👤 Motoristas</button><button type="button" data-cad-tab="setores">🏷️ Setores</button><button type="button" data-cad-tab="combustiveis">⛽ Combustíveis</button><button type="button" data-cad-tab="inspetores">🎖️ Inspetores</button><button type="button" data-cad-tab="gerentes">📋 Gerentes</button></div>
+          <div class="dash-pane" data-cad-pane="veiculos"><article class="panel">
             <div class="panel-head panel-head-sticky"><h3>Cadastro de veículos</h3></div>
             <form id="formVeiculo" class="form-grid compact-grid">
               <input type="hidden" id="veiculoEditId" />
@@ -1161,8 +1155,8 @@
               <table><thead><tr><th>Tipo</th><th>Prefixo</th><th>Marca/Modelo</th><th>Placa</th><th>Combustível</th><th>Status</th><th>Ações</th></tr></thead>
               <tbody id="veiculosTabela"></tbody></table>
             </div>
-          </article>
-          <article class="panel">
+          </article></div>
+          <div class="dash-pane" data-cad-pane="motoristas" hidden><article class="panel">
             <div class="panel-head panel-head-sticky"><h3>Cadastro de motoristas</h3></div>
             <form id="formMotorista" class="form-grid compact-grid">
               <input type="hidden" id="motoristaEditId" />
@@ -1175,10 +1169,8 @@
               <table><thead><tr><th>Nome</th><th>Matrícula</th><th>Status</th><th>Ações</th></tr></thead>
               <tbody id="motoristasTabela"></tbody></table>
             </div>
-          </article>
-        </div>
-        <div class="cards-grid two">
-          <article class="panel">
+          </article></div>
+          <div class="dash-pane" data-cad-pane="setores" hidden><article class="panel">
             <div class="panel-head panel-head-sticky"><h3>Cadastro de setores</h3></div>
             <form id="formSetor" class="form-grid compact-grid">
               <input type="hidden" id="setorEditId" />
@@ -1190,8 +1182,8 @@
               <table><thead><tr><th>Setor</th><th>Sigla</th><th>Ações</th></tr></thead>
               <tbody id="setoresTabela"></tbody></table>
             </div>
-          </article>
-          <article class="panel">
+          </article></div>
+          <div class="dash-pane" data-cad-pane="combustiveis" hidden><article class="panel">
             <div class="panel-head panel-head-sticky"><h3>Cadastro de combustíveis</h3></div>
             <form id="formCombustivel" class="form-grid compact-grid">
               <input type="hidden" id="combustivelEditId" />
@@ -1202,7 +1194,21 @@
               <table><thead><tr><th>Combustível</th><th>Ações</th></tr></thead>
               <tbody id="combustiveisTabela"></tbody></table>
             </div>
-          </article>
+          </article></div>
+          <div class="dash-pane" data-cad-pane="inspetores" hidden><article class="panel"><div class="panel-head panel-head-sticky"><h3>Inspetores em coordenação</h3></div>
+<form id="inspetoresCoordenacaoForm" class="form-grid compact-grid"><input type="hidden" name="id">
+<div class="field"><label for="inspetoresCoordenacaoNome">Nome</label><input id="inspetoresCoordenacaoNome" name="nome" required maxlength="120"></div>
+<div class="field"><label for="inspetoresCoordenacaoMatricula">Matrícula (opcional)</label><input id="inspetoresCoordenacaoMatricula" name="matricula" maxlength="30"></div>
+<div class="field"><label for="inspetoresCoordenacaoAtivo">Status</label><select id="inspetoresCoordenacaoAtivo" name="ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+<div class="actions-row full"><button type="submit" class="btn btn-primary">Salvar cadastro</button><button type="reset" class="btn btn-secondary">Novo / cancelar edição</button></div><p id="inspetoresCoordenacaoStatus" role="status" class="full"></p></form>
+<div class="table-wrap compact"><table><thead><tr><th>Nome</th><th>Matrícula</th><th>Status</th><th>Ações</th></tr></thead><tbody id="inspetoresCoordenacaoTabela"></tbody></table></div></article></div>
+          <div class="dash-pane" data-cad-pane="gerentes" hidden><article class="panel"><div class="panel-head panel-head-sticky"><h3>Gerentes de Abastecimento</h3></div>
+<form id="gerentesAbastecimentoForm" class="form-grid compact-grid"><input type="hidden" name="id">
+<div class="field"><label for="gerentesAbastecimentoNome">Nome</label><input id="gerentesAbastecimentoNome" name="nome" required maxlength="120"></div>
+<div class="field"><label for="gerentesAbastecimentoMatricula">Matrícula (opcional)</label><input id="gerentesAbastecimentoMatricula" name="matricula" maxlength="30"></div>
+<div class="field"><label for="gerentesAbastecimentoAtivo">Status</label><select id="gerentesAbastecimentoAtivo" name="ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+<div class="actions-row full"><button type="submit" class="btn btn-primary">Salvar cadastro</button><button type="reset" class="btn btn-secondary">Novo / cancelar edição</button></div><p id="gerentesAbastecimentoStatus" role="status" class="full"></p></form>
+<div class="table-wrap compact"><table><thead><tr><th>Nome</th><th>Matrícula</th><th>Status</th><th>Ações</th></tr></thead><tbody id="gerentesAbastecimentoTabela"></tbody></table></div></article></div>
         </div>
       </section>
 
@@ -1265,8 +1271,15 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>22.21</strong> · formato da régua: <code>XX.X</code></p>
+      <p class="status-label">Versão atual: <strong>22.22</strong> · formato da régua: <code>XX.X</code></p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.22</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Barra lateral ocupando toda a altura da esquerda; molduras como quadros fechados (cantos arredondados), tudo dentro.</li>
+            <li>Cadastros dividido em 6 abas (Veículos · Motoristas · Setores · Combustíveis · Inspetores · Gerentes) — cabe numa tela, sem rolagem de página.</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">22.21</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1329,7 +1342,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 22.21 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 22.22 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

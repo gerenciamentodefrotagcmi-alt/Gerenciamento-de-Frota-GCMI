@@ -4,6 +4,11 @@ Formato da régua: `XX.X` (minor de .1 a .9; depois incrementa o número cheio).
 A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
 
+## 22.22 — 05/11/2026
+- **Barra lateral** ocupando toda a altura da esquerda (não mais compacta), como quadro fechado.
+- **Molduras** como quadros fechados com cantos arredondados — tudo dentro do quadro.
+- **Cadastros em abas**: dividido em 6 abas (Veículos · Motoristas · Setores · Combustíveis · Inspetores · Gerentes). Cada uma cabe numa tela, sem rolagem de página — só a tabela rola na sua caixa.
+
 ## 22.21 — 05/11/2026
 - **Barra lateral compacta**: a moldura da esquerda encolhe ao conteúdo (brasão + botões) e não estica junto com a lista da direita.
 - **Tela travada** (a página não rola); só a lista da direita rola dentro da moldura.

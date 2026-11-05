@@ -744,7 +744,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.21',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.22',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -3744,9 +3744,9 @@ function bindAll() {
     var btns=group.querySelectorAll('.dash-tabbar button');
     var panes=group.querySelectorAll(':scope > .dash-pane');
     btns.forEach(function(b){ b.addEventListener('click',function(){
-      var t=b.dataset.dashTab||b.dataset.abTab||b.dataset.consTab;
+      var t=b.dataset.dashTab||b.dataset.abTab||b.dataset.consTab||b.dataset.cadTab;
       btns.forEach(function(x){ x.classList.toggle('active',x===b); });
-      panes.forEach(function(p){ var key=p.dataset.dashPane||p.dataset.abPane||p.dataset.consPane; p.hidden=(key!==t); });
+      panes.forEach(function(p){ var key=p.dataset.dashPane||p.dataset.abPane||p.dataset.consPane||p.dataset.cadPane; p.hidden=(key!==t); });
     }); });
   });
   // Filtros recolhíveis da Consulta
