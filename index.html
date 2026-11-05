@@ -378,6 +378,20 @@
     .rel-filtros .field{ gap:4px; }
     .rel-filtros .field input{ min-height:40px; }
     .rel-nota{ font-size:11.5px; color:rgba(243,232,198,.55); margin:0 2px 12px; line-height:1.4; }
+    /* Linha do tempo (modal) */
+    .tl-resumo{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+    .tl-resumo .tl-card{ border:1px solid rgba(214,156,56,.3); border-radius:12px; padding:9px 12px; background:rgba(214,156,56,.04); }
+    .tl-resumo .tl-card span{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:.4px; color:rgba(243,232,198,.5); }
+    .tl-resumo .tl-card strong{ display:block; font-size:17px; color:#f1c567; margin-top:2px; }
+    .tl-list{ position:relative; padding-left:22px; }
+    .tl-list::before{ content:''; position:absolute; left:6px; top:4px; bottom:4px; width:2px; background:linear-gradient(180deg,rgba(214,156,56,.5),rgba(214,156,56,.1)); }
+    .tl-item{ position:relative; padding:0 0 16px 0; }
+    .tl-item:last-child{ padding-bottom:2px; }
+    .tl-dot{ position:absolute; left:-22px; top:3px; width:12px; height:12px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#ffe9bd,#c98f3e); box-shadow:0 0 0 3px rgba(8,18,36,.9),0 0 8px rgba(243,197,107,.5); }
+    .tl-date{ font-size:13px; font-weight:800; color:#f3e8c6; }
+    .tl-meta{ font-size:12px; color:rgba(243,232,198,.72); margin-top:2px; }
+    .tl-trecho{ font-size:11px; color:#8fd0a0; margin-top:2px; }
+    .tl-trecho .tl-alert{ color:#ff9b9b; font-weight:700; }
     .rel-bars{ display:flex; flex-direction:column; gap:8px; }
     .rel-bar-row{ display:grid; grid-template-columns:130px 1fr 190px; align-items:center; gap:12px; font-size:13px; }
     .rel-bar-row .rb-label{ color:#f3e8c6; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -416,7 +430,9 @@
       body.autenticado .app-shell{ margin:46px 20px 20px !important; height:calc(100dvh - 66px) !important;
         padding:14px 16px 16px !important; gap:16px !important; }
       /* cabeçalho (topbar) como quadro: todos os cantos arredondados, alinhado ao topo */
-      body.autenticado .main-content{ padding-top:0 !important; }
+      body.autenticado .main-content{ padding-top:0 !important; padding-bottom:0 !important; }
+      /* direita alcança a mesma base da esquerda (sem sobra inferior assimétrica) */
+      body.autenticado .main-content > .screen.active{ padding-bottom:0 !important; }
       body.autenticado .main-content > .topbar{ margin:0 !important; border-radius:20px !important; min-height:0 !important; }
       body.autenticado .main-content > .topbar::before,
       body.autenticado .main-content > .topbar::after{ border-radius:20px 0 0 20px !important; }
@@ -482,7 +498,13 @@
       #relatorios > .quadro-data{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
       #relatorios > .quadro-data > .dash-tabs{ flex:1 1 auto; min-height:0; }
       #relatorios .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
-      #relatorios .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
+      #relatorios .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; display:flex; flex-direction:column; }
+      /* barras ampliadas, aproveitando toda a altura disponível */
+      #relatorios .rel-bars{ flex:1 1 auto; justify-content:space-evenly; gap:10px; }
+      #relatorios .rel-bar-row{ grid-template-columns:150px 1fr 230px; font-size:14px; }
+      #relatorios .rel-bar-track{ height:26px; }
+      #relatorios .rel-bar-row.clickable{ cursor:pointer; border-radius:8px; transition:background .15s; }
+      #relatorios .rel-bar-row.clickable:hover{ background:rgba(214,156,56,.09); }
       /* Troca de óleo: barra de ação por aba + grade de status */
       #trocaOleo .dash-pane-actions{ display:flex; justify-content:flex-end; margin:0 0 10px; }
       #trocaOleo .troca-oleo-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; align-content:start; }
@@ -787,7 +809,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.4</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.5</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1211,6 +1233,17 @@
         </div>
       </section>
 
+      <!-- Modal: linha do tempo de abastecimentos da VTR -->
+      <div id="modalTimeline" class="modal-neon" onclick="if(event.target===this)fecharTimeline()">
+        <div class="modal-neon-box" style="max-width:860px">
+          <div class="modal-neon-head"><h3 id="tlTitulo">Linha do tempo</h3><button class="modal-close" type="button" onclick="fecharTimeline()" style="background:none;border:0;color:#f1c567;font-size:20px;cursor:pointer">✕</button></div>
+          <div class="modal-neon-body">
+            <div class="tl-resumo" id="tlResumo"></div>
+            <div class="tl-list" id="tlList"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ════════════ TROCA DE ÓLEO ════════════ -->
       <section id="trocaOleo" class="screen">
         <div class="dash-tabs trocaoleo-tabs" id="trocaOleoTabs">
@@ -1423,8 +1456,16 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>23.4</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
+      <p class="status-label">Versão atual: <strong>23.5</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">23.5</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Relatórios: as barras de VTR (Comparativo e KM &amp; eficiência) viraram <strong>clicáveis</strong> e abrem a <strong>linha do tempo de abastecimentos</strong> daquela viatura — com resumo, km entre abastecimentos e alerta quando o KM retrocede.</li>
+            <li>Visual ampliado: barras maiores aproveitando toda a altura da tela, sem espaço desperdiçado.</li>
+            <li>Correção de simetria: a moldura da barra lateral passou a terminar exatamente alinhada com a moldura do conteúdo (não transborda mais até a borda externa).</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">23.4</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1530,7 +1571,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 23.4 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 23.5 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

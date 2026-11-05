@@ -6,6 +6,11 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normalizada em 05/11/2026**:
 a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
 
+## 23.5 — 05/11/2026
+- **Linha do tempo por VTR**: as barras de viatura (abas "Comparativo entre VTRs" e "KM & eficiência") viraram **clicáveis** e abrem um painel com a **linha do tempo de abastecimentos** daquela VTR — resumo (abastecimentos, KM rodado, litros, km/L), KM entre abastecimentos e **alerta em vermelho quando o hodômetro retrocede** (apoio à auditoria).
+- **Visual ampliado**: barras maiores, distribuídas por toda a altura da tela — sem espaço desperdiçado.
+- **Simetria da moldura**: corrigido o desalinhamento inferior — a barra lateral agora termina exatamente na mesma base do conteúdo à direita (não transborda mais até a moldura externa).
+
 ## 23.4 — 05/11/2026
 - **Relatórios — nova aba "KM & eficiência"**: quilometragem rodada por VTR no período (maior − menor hodômetro registrado) e eficiência **km/L**, ranqueando a viatura **mais utilizada** (a do topo). KM rodado e km/L também passam a constar na tabela de viaturas do **relatório impresso**.
 - **Acabamento da moldura única**: cabeçalho com os quatro cantos arredondados (antes o canto superior-esquerdo era reto); cabeçalho e barra lateral alinhados ao topo; reduzido o espaço até a borda superior; corrigida a folga da barra lateral até a moldura externa (não encosta mais).

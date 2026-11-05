@@ -746,7 +746,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.4',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.5',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1557,11 +1557,16 @@ function renderRelBars(sel, items, unit, markPeak) {
   const vis = items.filter(i=>i.val>0);
   if (!vis.length) { el.innerHTML = '<p style="opacity:.5;font-size:12px;margin:4px 2px">Sem dados no período.</p>'; return; }
   const max = Math.max(...vis.map(i=>i.val)) || 1;
-  el.innerHTML = vis.map(i=>`<div class="rel-bar-row${markPeak&&i.val===max?' peak':''}">
+  el.innerHTML = vis.map(i=>{
+    const clk = (i.vid!=null && i.vid!=='');
+    const cls = 'rel-bar-row'+(markPeak&&i.val===max?' peak':'')+(clk?' clickable':'');
+    const attr = clk ? ` onclick="abrirTimelineVtr('${i.vid}')" title="Ver linha do tempo de abastecimentos"` : '';
+    return `<div class="${cls}"${attr}>
     <span class="rb-label">${i.label}</span>
     <div class="rel-bar-track"><div class="rel-bar-fill" style="width:${Math.max(2,(i.val/max)*100)}%"></div></div>
     <span class="rb-val">${i.val.toLocaleString('pt-BR')}${unit||''}${i.extra?` <span class="rb-extra">· ${i.extra}</span>`:''}</span>
-  </div>`).join('');
+  </div>`;
+  }).join('');
 }
 
 function renderRelatorios() {
@@ -1583,7 +1588,7 @@ function renderRelatorios() {
     porVtr[k].v += num(a.valorTotal);
   });
   const vtrArr = Object.entries(porVtr)
-    .map(([id,o])=>({label:getVeiculoPrefixo(id), val:o.l, extra:brl(o.v)}))
+    .map(([id,o])=>({label:getVeiculoPrefixo(id), val:o.l, extra:brl(o.v), vid:id}))
     .sort((a,b)=>b.val-a.val);
   renderRelBars('#relBarsVtr', vtrArr, ' L', true);
 
@@ -1600,7 +1605,7 @@ function renderRelatorios() {
   const kmArr = Object.entries(porVtrKm).map(([id,o])=>{
     const rod = (o.max>o.min && o.min!==Infinity) ? (o.max-o.min) : 0;
     const kml = (rod>0 && o.l>0) ? rod/o.l : null;
-    return { label:getVeiculoPrefixo(id), val:rod, extra: kml!=null ? kml.toFixed(2).replace('.',',')+' km/L' : '—' };
+    return { label:getVeiculoPrefixo(id), val:rod, extra: kml!=null ? kml.toFixed(2).replace('.',',')+' km/L' : '—', vid:id };
   }).filter(x=>x.val>0).sort((a,b)=>b.val-a.val);
   renderRelBars('#relBarsKm', kmArr, ' km', true);
 
@@ -1625,6 +1630,51 @@ function renderRelatorios() {
   const diaArr = nomesDia.map((nome,i)=>({label:nome, val:porDia[i]}));
   renderRelBars('#relBarsDia', diaArr, ' L', true);
 }
+
+// Linha do tempo de abastecimentos de uma VTR (respeita o período do relatório)
+function abrirTimelineVtr(vid) {
+  const dados = getRelPeriodo()
+    .filter(a=>String(a.veiculoId)===String(vid))
+    .sort((a,b)=>{
+      const da=(a.dataAbastecimento||'')+(a.horaAbastecimento||''), db=(b.dataAbastecimento||'')+(b.horaAbastecimento||'');
+      if(da!==db) return da<db?-1:1;
+      return (a.id||0)-(b.id||0);
+    });
+  const prefixo=getVeiculoPrefixo(vid), placa=getVehiclePlate(vid);
+  if(qs('#tlTitulo')) qs('#tlTitulo').textContent='Linha do tempo — '+prefixo+(placa?' · '+placa:'');
+
+  const litros=dados.reduce((s,i)=>s+num(i.qtdLitros),0);
+  const valor=dados.reduce((s,i)=>s+num(i.valorTotal),0);
+  const kms=dados.map(a=>num(a.kmAtual)).filter(k=>k>0);
+  const rod=kms.length>1?(Math.max(...kms)-Math.min(...kms)):0;
+  const kml=(rod>0&&litros>0)?(rod/litros):null;
+  if(qs('#tlResumo')) qs('#tlResumo').innerHTML=`
+    <div class="tl-card"><span>Abastecimentos</span><strong>${dados.length}</strong></div>
+    <div class="tl-card"><span>KM rodado</span><strong>${rod>0?rod.toLocaleString('pt-BR')+' km':'—'}</strong></div>
+    <div class="tl-card"><span>Litros</span><strong>${litros.toLocaleString('pt-BR')} L</strong></div>
+    <div class="tl-card"><span>Eficiência</span><strong>${kml!=null?kml.toFixed(2).replace('.',',')+' km/L':'—'}</strong></div>`;
+
+  let prevKm=null;
+  if(qs('#tlList')) qs('#tlList').innerHTML = dados.length ? dados.map(a=>{
+    const km=num(a.kmAtual);
+    let trecho='';
+    if(prevKm!=null && km>0){
+      const d=km-prevKm;
+      trecho = d>=0
+        ? `+${d.toLocaleString('pt-BR')} km desde o anterior`
+        : `<span class="tl-alert">⚠ KM retrocedeu ${Math.abs(d).toLocaleString('pt-BR')} km</span>`;
+    }
+    if(km>0) prevKm=km;
+    return `<div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-date">${formatDisplayDate(a.dataAbastecimento,false)}${a.horaAbastecimento?' · '+a.horaAbastecimento:''}</div>
+      <div class="tl-meta">${num(a.qtdLitros).toLocaleString('pt-BR')} L · ${brl(a.valorTotal)} · KM ${km>0?km.toLocaleString('pt-BR'):'—'}${a.motoristaId?' · '+getMotoristaName(a.motoristaId):''}</div>
+      ${trecho?`<div class="tl-trecho">${trecho}</div>`:''}
+    </div>`;
+  }).join('') : '<p style="opacity:.5;font-size:13px">Sem abastecimentos no período para esta viatura.</p>';
+
+  const m=qs('#modalTimeline'); if(m) m.classList.add('open');
+}
+function fecharTimeline(){ const m=qs('#modalTimeline'); if(m) m.classList.remove('open'); }
 
 // Impressão do Relatório de Gestão (consumo geral + 3 comparativos)
 function imprimirRelatorios() {
