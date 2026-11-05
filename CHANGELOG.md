@@ -4,6 +4,11 @@ Formato da régua: `XX.X` (minor de .1 a .9; depois incrementa o número cheio).
 A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
 
+## 22.24 — 05/11/2026
+- **Moldura única (bezel)**: um fio dourado envolve toda a aplicação — barra superior, barra lateral e conteúdo — com margem igual nos quatro lados. Estética unificada e simétrica em todas as telas.
+- **Formulário de abastecimento compacto**: campos reorganizados e os derivados (Placa, Combustível, Matrícula, Valor total) reunidos numa faixa automática própria. Cabe inteiro na tela, sem rolagem.
+- **Tela inicial**: o card "Veículos ativos" deu lugar a um **ranking das 3 VTRs de maior consumo** (litros) no período, com destaque ouro/prata/bronze.
+
 ## 22.23 — 05/11/2026
 - **Troca de óleo em abas**: dividida em 3 abas (Registrar troca · Status por veículo · Histórico). Cada grupo cabe numa tela, sem rolagem de página — só o conteúdo da aba ativa rola dentro do quadro.
 - **Status por veículo** agora em grade que se ajusta à largura da tela (sem rolagem lateral de cartões).

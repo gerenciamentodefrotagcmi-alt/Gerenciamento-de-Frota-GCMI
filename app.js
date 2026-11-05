@@ -744,7 +744,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.23',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.24',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1492,7 +1492,14 @@ function renderDashboard() {
   qs('#dashTotalRegistros').textContent=state.abastecimentos.length;
   qs('#dashTotalLitros').textContent=state.abastecimentos.reduce((s,i)=>s+num(i.qtdLitros),0).toLocaleString('pt-BR');
   qs('#dashTotalValor').textContent=brl(state.abastecimentos.reduce((s,i)=>s+num(i.valorTotal),0));
-  qs('#dashVeiculosAtivos').textContent=state.veiculos.filter(v=>v.ativo!==false).length;
+  // Ranking: VTRs de maior consumo (litros) no período carregado
+  const consumoPorVtr={};
+  state.abastecimentos.forEach(a=>{ const l=num(a.qtdLitros); if(l>0 && a.veiculoId!=null && a.veiculoId!==''){ consumoPorVtr[a.veiculoId]=(consumoPorVtr[a.veiculoId]||0)+l; } });
+  const rankVtr=Object.entries(consumoPorVtr).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const rankEl=qs('#dashRankConsumo');
+  if(rankEl){ rankEl.innerHTML = rankVtr.length
+    ? rankVtr.map(([vid,litros],i)=>`<li><span class="rk-pos">${i+1}º</span><span class="rk-vtr">${getVeiculoPrefixo(vid)}</span><span class="rk-val">${litros.toLocaleString('pt-BR')} L</span></li>`).join('')
+    : '<li class="rank-empty">Sem dados no período</li>'; }
 
   // Média R$/L — últimos 30 dias
   const corte30=new Date(); corte30.setDate(corte30.getDate()-30);

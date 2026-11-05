@@ -373,9 +373,33 @@
     .dash-scroll::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
     .dash-scroll::-webkit-scrollbar-thumb { background:rgba(214,156,56,.35); border-radius:2px; }
     @media (max-height:780px){ .dash-scroll{ max-height:calc(100vh - 360px); min-height:180px; } }
+    /* ═══════════ Card de ranking (VTR maior consumo) ═══════════ */
+    .stat-card-rank{ align-items:stretch; }
+    .rank-list{ list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:2px; }
+    .rank-list li{ display:flex; align-items:center; gap:9px; font-size:13px; line-height:1.2;
+      padding:4px 2px; border-bottom:1px solid rgba(214,156,56,.1); }
+    .rank-list li:last-child{ border-bottom:0; }
+    .rank-list .rk-pos{ font-weight:800; width:20px; flex:0 0 auto; text-align:center;
+      font-size:12px; letter-spacing:-.02em; }
+    .rank-list li:nth-child(1) .rk-pos{ color:#f3cf6b; text-shadow:0 0 10px rgba(243,207,107,.5); } /* ouro */
+    .rank-list li:nth-child(2) .rk-pos{ color:#d6dae2; } /* prata */
+    .rank-list li:nth-child(3) .rk-pos{ color:#d59b63; } /* bronze */
+    .rank-list li:nth-child(1) .rk-vtr{ color:#fff; }
+    .rank-list .rk-vtr{ color:#f3e8c6; font-weight:700; flex:1 1 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .rank-list .rk-val{ color:rgba(243,232,198,.68); font-weight:700; flex:0 0 auto; font-variant-numeric:tabular-nums; }
+    .rank-list li:nth-child(1) .rk-val{ color:rgba(243,207,107,.9); }
+    .rank-list .rank-empty{ justify-content:flex-start; font-size:11px; opacity:.5; font-weight:600; border-bottom:0; }
+
     /* ═══════════ Molduras delimitam a rolagem (telas sem rolagem de página) ═══════════ */
     @media (min-width:861px){
       .app-shell{ height:100vh; overflow:hidden; gap:16px !important; }
+      /* ═══ Moldura única (bezel) envolvendo toda a aplicação — estética unificada em todas as telas ═══ */
+      body.autenticado::before{ content:''; position:fixed; inset:12px; pointer-events:none; z-index:70;
+        border:1.5px solid rgba(214,156,56,.58); border-radius:30px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
+      body.autenticado #barraSessao{ top:14px; left:16px; right:16px; height:40px; padding:0 26px;
+        background:transparent; z-index:71; }
+      body.autenticado .app-shell{ margin:56px 16px 16px !important; height:calc(100dvh - 72px) !important;
+        padding:18px 22px 22px !important; gap:18px !important; }
       /* esquerda: moldura COMPACTA (encolhe ao conteúdo, não estica); direita: moldura alta com a lista rolando */
       .sidebar{ overflow:hidden; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
       /* conceito de quadros separados: sem moldurão externo no conteúdo */
@@ -411,6 +435,25 @@
       #dashboard.screen.active > .dash-tabs, #abastecimentos.screen.active > .dash-tabs, #trocaOleo.screen.active > .dash-tabs{ flex:1 1 auto; min-height:0; }
       #dashboard .dash-tabs > .dash-pane:not([hidden]), #abastecimentos .dash-tabs > .dash-pane:not([hidden]), #trocaOleo .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
       #dashboard .dash-scroll, #abastecimentos .dash-scroll, #trocaOleo .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
+      /* Abastecimento: formulário compacto — cabe na tela sem rolagem */
+      #abastecimentos #formAbastecimento{ gap:8px 12px; }
+      #abastecimentos #formAbastecimento .field{ gap:3px; }
+      #abastecimentos #formAbastecimento > .field > label,
+      #abastecimentos #formAbastecimento .resumo-auto label{ font-size:11px; letter-spacing:.02em; }
+      #abastecimentos #formAbastecimento input,
+      #abastecimentos #formAbastecimento select,
+      #abastecimentos #formAbastecimento textarea{ min-height:36px; padding:6px 10px; border-radius:10px; }
+      #abastecimentos #formAbastecimento textarea{ min-height:44px; }
+      /* faixa de campos automáticos (derivados do veículo/valor) */
+      #abastecimentos .resumo-auto{ grid-column:1 / -1; display:grid; grid-template-columns:repeat(5,1fr); gap:10px;
+        padding:8px 12px; border:1px dashed rgba(214,156,56,.4); border-radius:12px; background:rgba(214,156,56,.04); }
+      #abastecimentos .resumo-auto .field{ gap:2px; }
+      #abastecimentos .resumo-auto input,
+      #abastecimentos .resumo-auto select{ min-height:30px !important; font-size:12px; padding:4px 8px; }
+      #abastecimentos .obs-col{ grid-column:1 / span 2; }
+      #abastecimentos .comp-col{ grid-column:3 / span 2; }
+      #abastecimentos #formAbastecimento .actions-row{ margin-top:2px; flex-direction:row; grid-column:1 / -1; }
+      #abastecimentos #formAbastecimento .actions-row .btn{ width:auto; }
       /* Troca de óleo: barra de ação por aba + grade de status */
       #trocaOleo .dash-pane-actions{ display:flex; justify-content:flex-end; margin:0 0 10px; }
       #trocaOleo .troca-oleo-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; align-content:start; }
@@ -713,7 +756,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.23</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.24</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -855,7 +898,7 @@
           <article class="stat-card"><span>Total de abastecimentos</span><strong id="dashTotalRegistros">0</strong></article>
           <article class="stat-card"><span>Litros no período</span><strong id="dashTotalLitros">0</strong></article>
           <article class="stat-card"><span>Valor total</span><strong id="dashTotalValor">R$ 0,00</strong></article>
-          <article class="stat-card"><span>Veículos ativos</span><strong id="dashVeiculosAtivos">0</strong></article>
+          <article class="stat-card stat-card-rank"><span>🏆 Maior consumo · VTR</span><ol id="dashRankConsumo" class="rank-list"><li class="rank-empty">Sem dados no período</li></ol></article>
           <article class="stat-card stat-card-alerta" id="dashCardAlerta" style="display:none" onclick="abrirModalAlertasVencidos()" title="Clique para ver detalhes">
             <span>⚠️ Atenção</span>
             <strong id="dashAlertaTexto">—</strong>
@@ -931,14 +974,16 @@
             <div class="field"><label>Autorização</label><input type="text" id="autorizacao" maxlength="6" placeholder="Até 6 dígitos" /></div>
             <div class="field"><label>Valor unitário</label><input type="number" id="valorUnitario" min="0" step="0.01" required /></div>
             <div class="field"><label>Litros</label><input type="number" id="qtdLitros" min="0" step="0.01" required /></div>
-            <div class="field readonly-field"><label>Prefixo</label><input type="text" id="prefixoExibicao" readonly /></div>
-            <div class="field readonly-field readonly-select-field"><label>Placa vinculada</label><select id="placaExibicao" disabled><option value="">Selecione o prefixo</option></select></div>
-            <div class="field readonly-field"><label>Combustível</label><input type="text" id="combustivelExibicao" readonly /></div>
-            <div class="field readonly-field"><label>Matrícula</label><input type="text" id="matriculaExibicao" readonly /></div>
-            <div class="field readonly-field"><label>Valor total</label><input type="text" id="valorTotalExibicao" readonly /></div>
-            <div class="field full"><label>Observação</label><textarea id="observacao" rows="3" placeholder="Informações complementares"></textarea></div>
-            <div class="field full">
-              <label>📎 Comprovante de abastecimento</label>
+            <div class="resumo-auto">
+              <div class="field readonly-field"><label>Prefixo</label><input type="text" id="prefixoExibicao" readonly /></div>
+              <div class="field readonly-field readonly-select-field"><label>Placa</label><select id="placaExibicao" disabled><option value="">—</option></select></div>
+              <div class="field readonly-field"><label>Combustível</label><input type="text" id="combustivelExibicao" readonly /></div>
+              <div class="field readonly-field"><label>Matrícula</label><input type="text" id="matriculaExibicao" readonly /></div>
+              <div class="field readonly-field"><label>Valor total</label><input type="text" id="valorTotalExibicao" readonly /></div>
+            </div>
+            <div class="field obs-col"><label>Observação</label><textarea id="observacao" rows="2" placeholder="Informações complementares"></textarea></div>
+            <div class="field comp-col">
+              <label>📎 Comprovante · Máx. 20 MB</label>
               <div class="comprovante-inline">
                 <label for="inputComprovanteLancamento" class="comprovante-label-inline">
                   <span id="comprovanteNomeLancamento">Clique para anexar PDF ou imagem</span>
@@ -948,9 +993,6 @@
                 <button type="button" class="btn btn-small" id="btnLimparComprovanteLancamento"
                   style="display:none" onclick="limparComprovanteLancamento()">✕ Remover</button>
               </div>
-              <small style="color:rgba(243,232,198,.35);font-size:10px">
-                Será vinculado ao registro após salvar · Máx. 20 MB
-              </small>
             </div>
             <div class="actions-row full">
               <button type="submit" class="btn btn-primary">Salvar abastecimento</button>
@@ -1305,8 +1347,16 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>22.23</strong> · formato da régua: <code>XX.X</code></p>
+      <p class="status-label">Versão atual: <strong>22.24</strong> · formato da régua: <code>XX.X</code></p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.24</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Moldura única (bezel) dourada envolvendo toda a aplicação — barra superior, barra lateral e conteúdo — com margem igual nos quatro lados. Estética unificada em todas as telas.</li>
+            <li>Formulário de abastecimento redesenhado: compacto e organizado, com os campos automáticos (Placa, Combustível, Matrícula, Valor total) numa faixa própria — cabe inteiro na tela, sem rolagem.</li>
+            <li>Tela inicial: card "Veículos ativos" substituído por um ranking das 3 VTRs de maior consumo (litros) no período, com destaque ouro/prata/bronze.</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">22.23</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1383,7 +1433,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 22.23 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 22.24 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>
