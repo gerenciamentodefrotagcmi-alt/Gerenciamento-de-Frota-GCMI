@@ -302,6 +302,7 @@ const SCREEN_META = {
   dashboard:      ['Gerenciamento de Abastecimento','Controle operacional de abastecimentos, consultas e cadastros.'],
   abastecimentos: ['Gerenciamento de Abastecimento','Lançamento, coordenação e manutenção de registros operacionais.'],
   consulta:       ['Consulta gerencial','Filtros, totais e resultados consolidados.'],
+  relatorios:     ['Relatórios de Gestão','Consumo geral e comparativos entre viaturas, horários e dias.'],
   trocaOleo:      ['Controle de Troca de Óleo','Manutenção preventiva por quilometragem com alertas automáticos.'],
   cadastros:      ['Cadastros','Veículos, motoristas, setores e combustíveis da Guarda Municipal de Ipatinga.'],
   config:         ['Fluxo do sistema','Controles do ambiente e modelo operacional de produção.']
@@ -314,6 +315,7 @@ function setScreen(screenId) {
   qs('#screenTitle').textContent = t;
   qs('#screenSubtitle').textContent = sub;
   if(screenId==='config'){ try{ armAtualizar(); }catch(e){} }
+  if(screenId==='relatorios'){ try{ renderRelatorios(); }catch(e){} }
   if(screenId==='consulta') {
     try{ syncComprovantesPrefixoSelect(); }catch(e){}
     setTimeout(()=>{ try{renderComprovantesConsulta();}catch(e){} }, 100);
@@ -744,7 +746,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.24',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.2',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1532,6 +1534,79 @@ function renderDashboard() {
   </tr>`).join(''):`<tr><td colspan="6">Sem dados.</td></tr>`;
   renderAlertasOleo();
   calculateDashAgg();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RELATÓRIOS DE GESTÃO (consumo geral + comparativos)
+// ═══════════════════════════════════════════════════════════════════
+function getRelPeriodo() {
+  const de = qs('#relDe')?.value || '';
+  const ate = qs('#relAte')?.value || '';
+  return (state.abastecimentos||[]).filter(a=>{
+    const d = a.dataAbastecimento || '';
+    if (de && d < de) return false;
+    if (ate && d > ate) return false;
+    return true;
+  });
+}
+
+// Renderiza uma lista de barras proporcionais num container.
+// items: [{label, val, extra?}]. markPeak destaca o maior valor.
+function renderRelBars(sel, items, unit, markPeak) {
+  const el = qs(sel); if (!el) return;
+  const vis = items.filter(i=>i.val>0);
+  if (!vis.length) { el.innerHTML = '<p style="opacity:.5;font-size:12px;margin:4px 2px">Sem dados no período.</p>'; return; }
+  const max = Math.max(...vis.map(i=>i.val)) || 1;
+  el.innerHTML = vis.map(i=>`<div class="rel-bar-row${markPeak&&i.val===max?' peak':''}">
+    <span class="rb-label">${i.label}</span>
+    <div class="rel-bar-track"><div class="rel-bar-fill" style="width:${Math.max(2,(i.val/max)*100)}%"></div></div>
+    <span class="rb-val">${i.val.toLocaleString('pt-BR')}${unit||''}${i.extra?` <span class="rb-extra">· ${i.extra}</span>`:''}</span>
+  </div>`).join('');
+}
+
+function renderRelatorios() {
+  const dados = getRelPeriodo();
+  const litros = dados.reduce((s,i)=>s+num(i.qtdLitros),0);
+  const valor  = dados.reduce((s,i)=>s+num(i.valorTotal),0);
+  if (qs('#relQtd'))    qs('#relQtd').textContent = dados.length;
+  if (qs('#relLitros')) qs('#relLitros').textContent = litros.toLocaleString('pt-BR') + ' L';
+  if (qs('#relValor'))  qs('#relValor').textContent = brl(valor);
+  if (qs('#relPreco'))  qs('#relPreco').textContent = litros>0 ? 'R$ ' + (valor/litros).toFixed(3).replace('.',',') : '—';
+
+  // Comparativo entre VTRs (por litros, com valor como detalhe), ordenado do maior
+  const porVtr = {};
+  dados.forEach(a=>{
+    if (a.veiculoId==null || a.veiculoId==='') return;
+    const k = a.veiculoId;
+    (porVtr[k] = porVtr[k] || {l:0,v:0});
+    porVtr[k].l += num(a.qtdLitros);
+    porVtr[k].v += num(a.valorTotal);
+  });
+  const vtrArr = Object.entries(porVtr)
+    .map(([id,o])=>({label:getVeiculoPrefixo(id), val:o.l, extra:brl(o.v)}))
+    .sort((a,b)=>b.val-a.val);
+  renderRelBars('#relBarsVtr', vtrArr, ' L', true);
+
+  // Por horário (hora do dia, cronológico)
+  const porHora = Array.from({length:24},()=>0);
+  dados.forEach(a=>{
+    const h = parseInt((a.horaAbastecimento||'').slice(0,2),10);
+    if (h>=0 && h<24) porHora[h] += num(a.qtdLitros);
+  });
+  const horaArr = porHora.map((l,h)=>({label:String(h).padStart(2,'0')+'h', val:l}));
+  renderRelBars('#relBarsHora', horaArr, ' L', true);
+
+  // Por dia da semana
+  const nomesDia = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const porDia = Array.from({length:7},()=>0);
+  dados.forEach(a=>{
+    const d = a.dataAbastecimento;
+    if (!d) return;
+    const wd = new Date(d+'T12:00:00').getDay();
+    if (wd>=0 && wd<7) porDia[wd] += num(a.qtdLitros);
+  });
+  const diaArr = nomesDia.map((nome,i)=>({label:nome, val:porDia[i]}));
+  renderRelBars('#relBarsDia', diaArr, ' L', true);
 }
 
 function renderAbastecimentosTable() {

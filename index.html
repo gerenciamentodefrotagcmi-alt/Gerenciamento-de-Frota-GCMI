@@ -373,6 +373,20 @@
     .dash-scroll::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
     .dash-scroll::-webkit-scrollbar-thumb { background:rgba(214,156,56,.35); border-radius:2px; }
     @media (max-height:780px){ .dash-scroll{ max-height:calc(100vh - 360px); min-height:180px; } }
+    /* ═══════════ Relatórios — barras comparativas ═══════════ */
+    .rel-filtros{ display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .rel-filtros .field{ gap:4px; }
+    .rel-filtros .field input{ min-height:40px; }
+    .rel-bars{ display:flex; flex-direction:column; gap:8px; }
+    .rel-bar-row{ display:grid; grid-template-columns:130px 1fr 190px; align-items:center; gap:12px; font-size:13px; }
+    .rel-bar-row .rb-label{ color:#f3e8c6; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .rel-bar-track{ height:18px; background:rgba(255,255,255,.05); border-radius:9px; overflow:hidden; border:1px solid rgba(214,156,56,.12); }
+    .rel-bar-fill{ height:100%; border-radius:9px; background:linear-gradient(90deg,#9c6f26,#f1c567); transition:width .4s ease; }
+    .rel-bar-row.peak .rb-label{ color:#fff; }
+    .rel-bar-row.peak .rel-bar-fill{ background:linear-gradient(90deg,#d89a33,#ffd77a); box-shadow:0 0 12px rgba(243,197,107,.45); }
+    .rel-bar-row .rb-val{ text-align:right; color:rgba(243,232,198,.82); font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .rel-bar-row .rb-val .rb-extra{ color:rgba(243,232,198,.5); font-weight:600; }
+
     /* ═══════════ Card de ranking (VTR maior consumo) ═══════════ */
     .stat-card-rank{ align-items:stretch; }
     .rank-list{ list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:2px; }
@@ -454,6 +468,13 @@
       #abastecimentos .comp-col{ grid-column:3 / span 2; }
       #abastecimentos #formAbastecimento .actions-row{ margin-top:2px; flex-direction:row; grid-column:1 / -1; }
       #abastecimentos #formAbastecimento .actions-row .btn{ width:auto; }
+      /* Relatórios: controles fixos + comparativos em abas (sem rolagem de página) */
+      #relatorios.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; gap:14px; padding-right:0 !important; }
+      #relatorios > .quadro-controles{ flex:0 0 auto; }
+      #relatorios > .quadro-data{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+      #relatorios > .quadro-data > .dash-tabs{ flex:1 1 auto; min-height:0; }
+      #relatorios .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+      #relatorios .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
       /* Troca de óleo: barra de ação por aba + grade de status */
       #trocaOleo .dash-pane-actions{ display:flex; justify-content:flex-end; margin:0 0 10px; }
       #trocaOleo .troca-oleo-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; align-content:start; }
@@ -756,7 +777,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.24</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.2</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -872,6 +893,7 @@
         <button class="menu-item active" data-screen="dashboard">Iniciar</button>
         <button class="menu-item" data-screen="abastecimentos">Abastecimentos</button>
         <button class="menu-item" data-screen="consulta">Consulta</button>
+        <button class="menu-item" data-screen="relatorios">📊 Relatórios</button>
         <button class="menu-item" data-screen="trocaOleo">🛢️ Troca de Óleo</button>
         <button class="menu-item" data-screen="cadastros">Cadastros</button>
         <button class="menu-item" data-screen="config">Fluxo do sistema</button>
@@ -1135,6 +1157,42 @@
         </div><!-- /quadro-data -->
       </section>
 
+      <!-- ════════════ RELATÓRIOS ════════════ -->
+      <section id="relatorios" class="screen">
+        <div class="quadro quadro-controles">
+          <div class="rel-filtros">
+            <div class="field"><label>De</label><input type="date" id="relDe" /></div>
+            <div class="field"><label>Até</label><input type="date" id="relAte" /></div>
+            <button type="button" class="btn btn-primary" onclick="renderRelatorios()">Aplicar período</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('relDe').value='';document.getElementById('relAte').value='';renderRelatorios()">Período todo</button>
+          </div>
+          <div class="cards-grid four" id="relResumo">
+            <article class="stat-card"><span>Abastecimentos</span><strong id="relQtd">0</strong></article>
+            <article class="stat-card"><span>Litros no período</span><strong id="relLitros">0</strong></article>
+            <article class="stat-card"><span>Valor total</span><strong id="relValor">R$ 0,00</strong></article>
+            <article class="stat-card"><span>Preço médio do litro</span><strong id="relPreco">—</strong></article>
+          </div>
+        </div>
+        <div class="quadro quadro-data">
+          <div class="dash-tabs" id="relTabs">
+            <div class="dash-tabbar" role="tablist">
+              <button type="button" class="active" data-ab-tab="vtr">🚓 Comparativo entre VTRs</button>
+              <button type="button" data-ab-tab="hora">⏰ Por horário</button>
+              <button type="button" data-ab-tab="dia">📅 Por dia da semana</button>
+            </div>
+            <div class="dash-pane" data-ab-pane="vtr">
+              <div class="dash-scroll"><div class="rel-bars" id="relBarsVtr"></div></div>
+            </div>
+            <div class="dash-pane" data-ab-pane="hora" hidden>
+              <div class="dash-scroll"><div class="rel-bars" id="relBarsHora"></div></div>
+            </div>
+            <div class="dash-pane" data-ab-pane="dia" hidden>
+              <div class="dash-scroll"><div class="rel-bars" id="relBarsDia"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ════════════ TROCA DE ÓLEO ════════════ -->
       <section id="trocaOleo" class="screen">
         <div class="dash-tabs trocaoleo-tabs" id="trocaOleoTabs">
@@ -1347,11 +1405,18 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>22.24</strong> · formato da régua: <code>XX.X</code></p>
+      <p class="status-label">Versão atual: <strong>23.2</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
       <div class="support-cards" style="grid-template-columns:1fr">
         <div class="support-card">
-          <h4><span style="color:#f1c567">22.24</span> · 05/11/2026</h4>
+          <h4><span style="color:#f1c567">23.2</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Nova tela <strong>Relatórios de Gestão</strong>: consumo geral do período (abastecimentos, litros, valor e preço médio do litro) e três comparativos em barras — <em>entre VTRs</em>, <em>por horário</em> e <em>por dia da semana</em> — com filtro de período e destaque do maior valor.</li>
+          </ul>
+        </div>
+        <div class="support-card">
+          <h4><span style="color:#f1c567">23.1</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li><em>Régua normalizada:</em> a linha 22.x havia passado de .9; encerrada e retomada em 23.1 (daqui: 23.1 → 23.9 → v24).</li>
             <li>Moldura única (bezel) dourada envolvendo toda a aplicação — barra superior, barra lateral e conteúdo — com margem igual nos quatro lados. Estética unificada em todas as telas.</li>
             <li>Formulário de abastecimento redesenhado: compacto e organizado, com os campos automáticos (Placa, Combustível, Matrícula, Valor total) numa faixa própria — cabe inteiro na tela, sem rolagem.</li>
             <li>Tela inicial: card "Veículos ativos" substituído por um ranking das 3 VTRs de maior consumo (litros) no período, com destaque ouro/prata/bronze.</li>
@@ -1433,7 +1498,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 22.24 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 23.2 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

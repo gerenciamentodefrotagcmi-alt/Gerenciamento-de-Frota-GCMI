@@ -1,10 +1,20 @@
 # Histórico de versões — Gerenciamento de Frota (GCMI)
 
-Formato da régua: `XX.X` (minor de .1 a .9; depois incrementa o número cheio).
+Formato da régua: `XX.X` (minor de .1 a .9; ao chegar em .9, incrementa o número cheio — ex.: 23.9 → v24).
 A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
+Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normalizada em 05/11/2026**:
+a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
 
-## 22.24 — 05/11/2026
+## 23.2 — 05/11/2026
+- **Nova tela "Relatórios de Gestão"** (item no menu): voltada à emissão de relatórios para o comando, com objetivo de gestão e não só exibição de números.
+  - **Consumo geral** do período: nº de abastecimentos, litros, valor total e preço médio do litro.
+  - **Comparativo entre VTRs** (litros, com valor), ordenado do maior consumo.
+  - **Por horário** (hora do dia) e **por dia da semana**, com destaque automático do pico.
+  - Filtro de período (De/Até) e botão "Período todo". Barras proporcionais no padrão dourado; cabe na tela sem rolagem.
+
+## 23.1 — 05/11/2026
+- **Régua normalizada**: linha 22.x (que havia passado de .9) encerrada; numeração retomada em 23.1.
 - **Moldura única (bezel)**: um fio dourado envolve toda a aplicação — barra superior, barra lateral e conteúdo — com margem igual nos quatro lados. Estética unificada e simétrica em todas as telas.
 - **Formulário de abastecimento compacto**: campos reorganizados e os derivados (Placa, Combustível, Matrícula, Valor total) reunidos numa faixa automática própria. Cabe inteiro na tela, sem rolagem.
 - **Tela inicial**: o card "Veículos ativos" deu lugar a um **ranking das 3 VTRs de maior consumo** (litros) no período, com destaque ouro/prata/bronze.
