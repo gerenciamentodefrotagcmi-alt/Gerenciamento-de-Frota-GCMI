@@ -375,11 +375,11 @@
     @media (max-height:780px){ .dash-scroll{ max-height:calc(100vh - 360px); min-height:180px; } }
     /* ═══════════ Molduras delimitam a rolagem (telas sem rolagem de página) ═══════════ */
     @media (min-width:861px){
-      .app-shell{ height:100vh; overflow:hidden; gap:0 !important; }
-      /* uma única moldura dourada contornando a tela toda; divisor entre esquerda (estática) e direita (rola) */
-      .sidebar{ border:1px solid rgba(214,156,56,.6) !important; border-right:1px solid rgba(214,156,56,.4) !important; border-radius:26px 0 0 26px !important; overflow:hidden; }
+      .app-shell{ height:100vh; overflow:hidden; gap:16px !important; }
+      /* esquerda: moldura COMPACTA (encolhe ao conteúdo, não estica); direita: moldura alta com a lista rolando */
+      .sidebar{ align-self:start !important; max-height:100%; overflow:hidden; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
       .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden;
-        margin-left:0 !important; border:1px solid rgba(214,156,56,.6) !important; border-left:0 !important; border-radius:0 26px 26px 0 !important; }
+        margin-left:0 !important; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
       .main-content > .topbar{ flex:0 0 auto; }
       .main-content > .screen.active{ flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; padding-right:10px; }
       .main-content > .screen.active::-webkit-scrollbar{ width:8px; }
@@ -392,6 +392,12 @@
       #consulta .consulta-tabs > .dash-pane{ flex:1 1 auto; min-height:0; }
       #consulta .consulta-tabs > .dash-pane:not([hidden]){ display:flex; flex-direction:column; }
       #consulta .consulta-tabs .dash-scroll{ flex:1 1 auto; max-height:none; min-height:0; }
+      /* Máximo aproveitamento da tela: dashboard e abastecimentos preenchem a moldura inteira */
+      #dashboard.screen.active, #abastecimentos.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; gap:14px; padding-right:0 !important; }
+      #dashboard.screen.active > *:not(.dash-tabs), #abastecimentos.screen.active > *:not(.dash-tabs){ flex:0 0 auto; }
+      #dashboard.screen.active > .dash-tabs, #abastecimentos.screen.active > .dash-tabs{ flex:1 1 auto; min-height:0; }
+      #dashboard .dash-tabs > .dash-pane:not([hidden]), #abastecimentos .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+      #dashboard .dash-scroll, #abastecimentos .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
     }
     .table-inner { width:100%; border-collapse:collapse; }
 
@@ -679,7 +685,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.20</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.21</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1259,8 +1265,16 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>22.20</strong> · formato da régua: <code>XX.X</code></p>
+      <p class="status-label">Versão atual: <strong>22.21</strong> · formato da régua: <code>XX.X</code></p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.21</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Barra lateral compacta: a moldura da esquerda encolhe ao conteúdo (brasão + botões) e não estica junto com a lista da direita.</li>
+            <li>Tela travada (a página não rola); só a lista da direita rola dentro da moldura.</li>
+            <li>Máximo aproveitamento da tela: a lista preenche toda a altura da moldura, sem vazios.</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">22.20</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1315,7 +1329,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 22.20 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 22.21 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>
