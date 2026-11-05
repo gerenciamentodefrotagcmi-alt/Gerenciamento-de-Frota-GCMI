@@ -744,7 +744,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.18',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.19',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -3739,15 +3739,20 @@ function bindAll() {
     });
   }
 
-  // Abas internas (dashboard, abastecimentos...) — escopadas por container
+  // Abas internas (dashboard, abastecimentos, consulta...) — escopadas por container
   qsa('.dash-tabs').forEach(function(group){
     var btns=group.querySelectorAll('.dash-tabbar button');
     var panes=group.querySelectorAll(':scope > .dash-pane');
     btns.forEach(function(b){ b.addEventListener('click',function(){
-      var t=b.dataset.dashTab||b.dataset.abTab;
+      var t=b.dataset.dashTab||b.dataset.abTab||b.dataset.consTab;
       btns.forEach(function(x){ x.classList.toggle('active',x===b); });
-      panes.forEach(function(p){ var key=p.dataset.dashPane||p.dataset.abPane; p.hidden=(key!==t); });
+      panes.forEach(function(p){ var key=p.dataset.dashPane||p.dataset.abPane||p.dataset.consPane; p.hidden=(key!==t); });
     }); });
+  });
+  // Filtros recolhíveis da Consulta
+  var toggFiltros=qs('#btnToggleFiltros');
+  if(toggFiltros) toggFiltros.addEventListener('click',function(){
+    var f=qs('#consultaFiltros'); if(f) f.classList.toggle('collapsed');
   });
 
   // ESC fecha todos os modais

@@ -361,6 +361,12 @@
     .dash-pane[hidden] { display:none; }
     .dash-scroll { overflow-y:auto; max-height:calc(100vh - 430px); min-height:240px; padding:14px 18px; }
     .dash-pane-pad { padding:16px 18px; }
+    /* Filtros recolhíveis da Consulta */
+    .consulta-filtros-head { cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+    .consulta-filtros-toggle { color:#d9b45f; font-size:13px; transition:transform .18s; padding-left:10px; }
+    .consulta-filtros:not(.collapsed) .consulta-filtros-toggle { transform:rotate(90deg); }
+    .consulta-filtros.collapsed .consulta-filtros-body { display:none; }
+    .consulta-filtros-body { padding:14px 18px; }
     .dash-scroll::-webkit-scrollbar { width:4px; }
     .dash-scroll::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
     .dash-scroll::-webkit-scrollbar-thumb { background:rgba(214,156,56,.35); border-radius:2px; }
@@ -378,8 +384,12 @@
       .main-content > .screen.active::-webkit-scrollbar-track{ background:transparent; }
       .main-content > .screen.active::-webkit-scrollbar-thumb{ background:rgba(214,156,56,.3); border-radius:4px; }
       .main-content > .screen.active::-webkit-scrollbar-thumb:hover{ background:rgba(214,156,56,.55); }
-      /* Consulta: um único rolamento (o da moldura) — painéis internos fluem */
-      #consulta .panel-body-scroll{ overflow:visible !important; max-height:none !important; }
+      /* Consulta: moldura fixa; só a lista da aba ativa rola */
+      #consulta.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; gap:14px; padding-right:0 !important; }
+      #consulta .consulta-tabs{ flex:1 1 auto; min-height:0; }
+      #consulta .consulta-tabs > .dash-pane{ flex:1 1 auto; min-height:0; }
+      #consulta .consulta-tabs > .dash-pane:not([hidden]){ display:flex; flex-direction:column; }
+      #consulta .consulta-tabs .dash-scroll{ flex:1 1 auto; max-height:none; min-height:0; }
     }
     .table-inner { width:100%; border-collapse:collapse; }
 
@@ -667,7 +677,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.18</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.19</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -930,9 +940,9 @@
 
       <!-- ════════════ CONSULTA ════════════ -->
       <section id="consulta" class="screen">
-        <div class="panel panel-sticky-form">
-          <div class="panel-head panel-head-sticky"><h3>Consulta avançada</h3></div>
-          <div class="panel-body-scroll">
+        <div class="panel consulta-filtros collapsed" id="consultaFiltros">
+          <div class="panel-head panel-head-sticky consulta-filtros-head" id="btnToggleFiltros" title="Mostrar/ocultar filtros"><h3>🔍 Consulta avançada</h3><span class="consulta-filtros-toggle" aria-hidden="true">▸</span></div>
+          <div class="consulta-filtros-body">
           <div class="form-grid compact-grid">
             <div class="field"><label>ID</label><input id="fId" type="number" /></div>
             <div class="field"><label>Pesquisar em</label><select id="fCampoData"><option value="dataAbastecimento">Data do abastecimento</option></select></div>
@@ -954,7 +964,7 @@
             <button class="btn btn-print" id="btnImprimirRelatorio">🖨 Imprimir relatório</button>
             <button class="btn btn-export-csv" id="btnExportarCsv">⬇ Exportar CSV</button>
           </div>
-          </div><!-- /panel-body-scroll -->
+          </div><!-- /consulta-filtros-body -->
         </div>
         <div class="cards-grid three">
           <article class="stat-card small"><span>Registros filtrados</span><strong id="consultaTotal">0</strong></article>
@@ -962,9 +972,13 @@
           <article class="stat-card small"><span>Valor filtrado</span><strong id="consultaValor">R$ 0,00</strong></article>
         </div>
         <div id="consultaPeriodoInfo" class="highlight-box">Período livre.</div>
-        <div class="panel panel-sticky-form">
-          <div class="panel-head panel-head-sticky"><h3>Resultados</h3></div>
-          <div class="panel-body-scroll">
+        <div class="dash-tabs consulta-tabs" id="consultaTabs">
+          <div class="dash-tabbar" role="tablist">
+            <button type="button" class="active" data-cons-tab="resultados">📋 Resultados</button>
+            <button type="button" data-cons-tab="comprovantes">📎 Comprovantes</button>
+          </div>
+          <div class="dash-pane" data-cons-pane="resultados">
+          <div class="dash-scroll">
             <table class="table-inner">
               <thead>
                 <tr>
@@ -975,11 +989,12 @@
               </thead>
               <tbody id="consultaTabela"></tbody>
             </table>
-          </div>
-        </div>
-
-        <!-- Painel: Consulta e impressão de comprovantes -->
-        <div class="panel" style="overflow:visible">
+          </div><!-- /dash-scroll resultados -->
+          </div><!-- /dash-pane resultados -->
+          <div class="dash-pane" data-cons-pane="comprovantes" hidden>
+          <div class="dash-scroll">
+          <!-- Painel: Consulta e impressão de comprovantes -->
+          <div class="panel" style="overflow:visible;border:0;background:transparent;box-shadow:none;padding:0">
           <div class="panel-head panel-head-sticky">
             <h3>📎 Comprovantes</h3>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -1025,12 +1040,15 @@
           <!-- Resumo -->
           <div id="comprovantesResumo" style="font-size:11px;color:rgba(214,156,56,.6);padding:6px 18px;font-family:monospace"></div>
           <!-- Lista -->
-          <div class="panel-body-scroll" style="max-height:360px;margin-top:6px" id="listaComprovantesConsulta">
+          <div class="comp-lista" style="margin-top:6px" id="listaComprovantesConsulta">
             <div style="color:rgba(243,232,198,.35);font-size:13px;text-align:center;padding:24px">
               Use os filtros acima e clique em Buscar.
             </div>
           </div>
-        </div>
+          </div><!-- /panel comprovantes -->
+          </div><!-- /dash-scroll comprovantes -->
+          </div><!-- /dash-pane comprovantes -->
+        </div><!-- /consulta-tabs -->
       </section>
 
       <!-- ════════════ TROCA DE ÓLEO ════════════ -->
@@ -1239,8 +1257,15 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>22.18</strong> · formato da régua: <code>XX.X</code></p>
+      <p class="status-label">Versão atual: <strong>22.19</strong> · formato da régua: <code>XX.X</code></p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.19</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Consulta reorganizada: filtros recolhíveis e as listas Resultados/Comprovantes em abas — só a lista ativa rola, dentro da moldura (um único rolamento).</li>
+            <li>Service worker ajustado para sempre buscar a versão mais nova (atualização automática a cada publicação, sem limpar cache).</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">22.18</span> · 04/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1281,7 +1306,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 22.18 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 22.19 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

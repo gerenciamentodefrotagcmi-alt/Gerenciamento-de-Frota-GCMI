@@ -4,6 +4,10 @@ Formato da régua: `XX.X` (minor de .1 a .9; depois incrementa o número cheio).
 A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
 
+## 22.19 — 05/11/2026
+- **Consulta reorganizada**: o painel de filtros virou recolhível e as duas listas (Resultados e Comprovantes) viraram abas. Só a lista da aba ativa rola, dentro da moldura — um único rolamento, sem a página rolar. Resolve o acúmulo de rolamentos e o excesso visual.
+- **Service worker (sw.js)**: passou a buscar sempre a versão mais nova da rede (no-store). Assim, cada publicação aparece automaticamente, sem precisar limpar o cache do navegador.
+
 ## 22.18 — 04/11/2026
 - Correção do **botão Imprimir** do relatório: o `onclick` inline era removido pelo DOMPurify (`writeDocument`); agora o clique é ligado a partir da janela-mãe pelo `id`, e a impressão funciona.
 - **Tela inicial** reorganizada em **abas** ("Últimos abastecimentos" e "Consumo por placa e período"), com a área da tabela limitada à altura da tela (rolagem interna) — a página deixa de rolar e a tela fica menos carregada.
