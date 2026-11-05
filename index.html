@@ -473,6 +473,13 @@
       #dashboard.screen.active > .dash-tabs, #abastecimentos.screen.active > .dash-tabs, #trocaOleo.screen.active > .dash-tabs{ flex:1 1 auto; min-height:0; }
       #dashboard .dash-tabs > .dash-pane:not([hidden]), #abastecimentos .dash-tabs > .dash-pane:not([hidden]), #trocaOleo .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
       #dashboard .dash-scroll, #abastecimentos .dash-scroll, #trocaOleo .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
+      /* Iniciar: aproveitar o espaço — cards preenchem a altura, sem vão interno */
+      #dashboard .quadro-controles .cards-grid{ margin-bottom:0 !important; align-items:stretch; }
+      #dashboard #dashAlertasOleo:empty{ display:none !important; }
+      #dashboard .stat-card{ display:flex; flex-direction:column; justify-content:center; gap:8px; }
+      #dashboard .stat-card:not(.stat-card-rank) strong{ font-size:clamp(30px,3vw,48px) !important; line-height:1.05; }
+      #dashboard .stat-card span{ margin-bottom:0 !important; }
+      #dashboard .stat-card-rank{ justify-content:flex-start; }
       /* Abastecimento: formulário compacto — cabe na tela sem rolagem */
       #abastecimentos #formAbastecimento{ gap:8px 12px; }
       #abastecimentos #formAbastecimento .field{ gap:3px; }
@@ -561,6 +568,13 @@
     .panel-body-scroll table thead th {
       position: sticky; top: 0; z-index: 1;
       background: linear-gradient(135deg,rgba(10,23,42,.98),rgba(10,22,40,.99));
+    }
+    /* thead fixa opaca também nas tabelas .table-inner (Iniciar, Abastecimentos, Consulta...) — evita o "fantasma" ao rolar */
+    .dash-scroll table.table-inner thead th,
+    .table-inner thead th {
+      position: sticky; top: 0; z-index: 3;
+      background: #0c1a2e !important;
+      box-shadow: inset 0 -1px 0 rgba(214,156,56,.25);
     }
 
 
@@ -809,7 +823,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.5</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.6</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1456,8 +1470,15 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>23.5</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
+      <p class="status-label">Versão atual: <strong>23.6</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">23.6</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Tela Iniciar: cartões ampliados preenchendo a altura (números maiores, sem vão interno) e melhor aproveitamento do espaço.</li>
+            <li>Correção do cabeçalho da tabela "Últimos abastecimentos": passou a ser fixo e opaco ao rolar (acabou o efeito "fantasma" de linhas sobre o cabeçalho).</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">23.5</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1571,7 +1592,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 23.5 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 23.6 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

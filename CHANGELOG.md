@@ -6,6 +6,10 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normalizada em 05/11/2026**:
 a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
 
+## 23.6 — 05/11/2026
+- **Tela Iniciar — aproveitamento do espaço**: cartões ampliados preenchendo a altura disponível (números maiores, conteúdo centralizado, sem vão interno); a tabela "Últimos abastecimentos" ganhou mais linhas visíveis.
+- **Correção da tabela "Últimos abastecimentos"**: o cabeçalho passou a ser fixo e **opaco** ao rolar — resolvido o efeito "fantasma" (linhas aparecendo sobre o cabeçalho). Vale para as demais tabelas `.table-inner`.
+
 ## 23.5 — 05/11/2026
 - **Linha do tempo por VTR**: as barras de viatura (abas "Comparativo entre VTRs" e "KM & eficiência") viraram **clicáveis** e abrem um painel com a **linha do tempo de abastecimentos** daquela VTR — resumo (abastecimentos, KM rodado, litros, km/L), KM entre abastecimentos e **alerta em vermelho quando o hodômetro retrocede** (apoio à auditoria).
 - **Visual ampliado**: barras maiores, distribuídas por toda a altura da tela — sem espaço desperdiçado.
