@@ -367,7 +367,10 @@
     @media (max-height:780px){ .dash-scroll{ max-height:calc(100vh - 360px); min-height:180px; } }
     /* ═══════════ Molduras delimitam a rolagem (telas sem rolagem de página) ═══════════ */
     @media (min-width:861px){
-      .app-shell{ height:100vh; overflow:hidden; }
+      .app-shell{ height:100vh; overflow:hidden; position:relative; }
+      /* fio dourado interno simétrico contornando toda a moldura */
+      .app-shell::after{ content:""; position:absolute; pointer-events:none; z-index:6;
+        inset:18px; border:1px solid rgba(214,156,56,.3); border-radius:28px; }
       .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden; }
       .main-content > .topbar{ flex:0 0 auto; }
       .main-content > .screen.active{ flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; padding-right:10px; }
@@ -772,7 +775,6 @@
         <img src="./assets/logo_guarda_civil_municipal_ipatinga.png" alt="Logo Guarda Civil Municipal de Ipatinga" class="brand-logo" />
         <div>
           <h1>Guarda Municipal de Ipatinga</h1>
-          <p>Centro institucional de gestão operacional</p>
         </div>
       </div>
       <nav class="menu">
@@ -850,9 +852,13 @@
 
       <!-- ════════════ ABASTECIMENTOS ════════════ -->
       <section id="abastecimentos" class="screen">
-        <div class="panel panel-sticky-form">
-          <div class="panel-head panel-head-sticky"><h3>Novo abastecimento</h3><span class="tag">Lançamento operacional</span></div>
-          <div class="panel-body-scroll">
+        <div class="dash-tabs" id="abTabs">
+          <div class="dash-tabbar" role="tablist">
+            <button type="button" class="active" data-ab-tab="novo">📝 Novo abastecimento</button>
+            <button type="button" data-ab-tab="registros">📋 Registros</button>
+          </div>
+          <div class="dash-pane" data-ab-pane="novo">
+          <div class="dash-scroll">
           <form id="formAbastecimento" class="form-grid">
             <input type="hidden" id="abastecimentoId" />
             <div class="field"><label>Data do lançamento</label><input type="date" id="dataLancamento" required /></div>
@@ -901,14 +907,11 @@
               <button type="button" id="btnCancelarEdicao" class="btn btn-secondary">Cancelar edição</button>
             </div>
           </form>
-          </div><!-- /panel-body-scroll -->
-        </div>
-        <div class="panel panel-sticky-form">
-          <div class="panel-head panel-head-sticky">
-            <h3>Registros</h3>
-            <span class="muted">Clique em ▶ para expandir detalhes</span>
-          </div>
-          <div class="panel-body-scroll">
+          </div><!-- /dash-scroll -->
+          </div><!-- /dash-pane novo -->
+          <div class="dash-pane" data-ab-pane="registros" hidden>
+          <div class="dash-scroll">
+            <p class="muted" style="margin:0 0 8px 2px;font-size:11px">Clique em ▶ para expandir detalhes</p>
             <table class="table-inner">
               <thead>
                 <tr>
@@ -918,8 +921,9 @@
               </thead>
               <tbody id="abastecimentosTabela"></tbody>
             </table>
-          </div>
-        </div>
+          </div><!-- /dash-scroll -->
+          </div><!-- /dash-pane registros -->
+        </div><!-- /dash-tabs -->
       </section>
 
       <!-- ════════════ CONSULTA ════════════ -->
@@ -1241,7 +1245,10 @@
             <li>Correção do botão Imprimir do relatório (passou a imprimir ao clicar).</li>
             <li>Relatório com numeração sequencial (Nº) e ordem crescente pela data de abastecimento.</li>
             <li>Tela inicial reorganizada em abas (Últimos abastecimentos · Consumo por placa e período).</li>
+            <li>Tela de Abastecimentos dividida em abas (Novo abastecimento · Registros) — um único rolamento.</li>
             <li>Todas as telas com rolagem interna à moldura — a página não rola mais (desktop).</li>
+            <li>Moldura com fio dourado interno simétrico contornando a página.</li>
+            <li>Removido o subtítulo da barra lateral.</li>
           </ul>
         </div>
         <div class="support-card">

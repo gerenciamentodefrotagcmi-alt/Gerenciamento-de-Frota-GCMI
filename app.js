@@ -3739,12 +3739,16 @@ function bindAll() {
     });
   }
 
-  // Dashboard em abas (tela Iniciar)
-  qsa('[data-dash-tab]').forEach(function(b){ b.addEventListener('click',function(){
-    var t=b.dataset.dashTab;
-    qsa('[data-dash-tab]').forEach(function(x){ x.classList.toggle('active',x===b); });
-    qsa('.dash-pane').forEach(function(p){ p.hidden=(p.dataset.dashPane!==t); });
-  }); });
+  // Abas internas (dashboard, abastecimentos...) — escopadas por container
+  qsa('.dash-tabs').forEach(function(group){
+    var btns=group.querySelectorAll('.dash-tabbar button');
+    var panes=group.querySelectorAll(':scope > .dash-pane');
+    btns.forEach(function(b){ b.addEventListener('click',function(){
+      var t=b.dataset.dashTab||b.dataset.abTab;
+      btns.forEach(function(x){ x.classList.toggle('active',x===b); });
+      panes.forEach(function(p){ var key=p.dataset.dashPane||p.dataset.abPane; p.hidden=(key!==t); });
+    }); });
+  });
 
   // ESC fecha todos os modais
   // Comprovantes consulta — busca automática ao mudar qualquer filtro

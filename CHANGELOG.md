@@ -9,6 +9,9 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 - **Tela inicial** reorganizada em **abas** ("Últimos abastecimentos" e "Consumo por placa e período"), com a área da tabela limitada à altura da tela (rolagem interna) — a página deixa de rolar e a tela fica menos carregada.
 - **Relatório** com **numeração sequencial** (coluna Nº) e **ordem crescente pela data de abastecimento** — o item 01 é o do primeiro dia do período filtrado.
 - **Molduras delimitam a rolagem**: no desktop cada tela rola por dentro da sua moldura e a página em si não rola mais (acabamento mais refinado).
+- **Abastecimentos** dividido em abas (Novo abastecimento · Registros) — elimina os dois rolamentos e o excesso visual da lista de registros.
+- **Moldura** com fio dourado interno simétrico contornando toda a página (acabamento).
+- Removido o subtítulo "Centro institucional de gestão operacional" da barra lateral.
 
 ## 22.17 — 04/11/2026
 - Medidor de armazenamento no Fluxo do sistema, com uso real do banco via Supabase
