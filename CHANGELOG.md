@@ -4,6 +4,10 @@ Formato da régua: `XX.X` (minor de .1 a .9; depois incrementa o número cheio).
 A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
 
+## 22.18 — 04/11/2026
+- Correção do **botão Imprimir** do relatório: o `onclick` inline era removido pelo DOMPurify (`writeDocument`); agora o clique é ligado a partir da janela-mãe pelo `id`, e a impressão funciona.
+- **Tela inicial** reorganizada em **abas** ("Últimos abastecimentos" e "Consumo por placa e período"), com a área da tabela limitada à altura da tela (rolagem interna) — a página deixa de rolar e a tela fica menos carregada.
+
 ## 22.17 — 04/11/2026
 - Medidor de armazenamento no Fluxo do sistema, com uso real do banco via Supabase
   (função `gcm_uso_armazenamento()`), restrito ao administrador.

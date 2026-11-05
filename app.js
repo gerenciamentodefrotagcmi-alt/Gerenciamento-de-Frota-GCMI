@@ -617,7 +617,7 @@ function imprimirRelatorio() {
   .noprint-btn{position:fixed;top:12px;right:16px;background:#0e2147;color:#fff;border:none;padding:9px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:99}
   .noprint-btn:hover{background:#15305f}
   @media print{@page{margin:1cm;size:A4 landscape}.noprint-btn{display:none!important}}</style></head><body>
-  <button class="noprint-btn" onclick="window.print()">🖨 Imprimir</button>
+  <button class="noprint-btn" id="btnImprimirRel" type="button">🖨 Imprimir</button>
   <div class="hdr"><img src="${BRASAO_DATAURL}" onerror="this.style.display='none'"/>
   <div><h1>Prefeitura Municipal de Ipatinga — Guarda Civil Municipal</h1>
   <h2>Relatório de Controle de Abastecimento de Viaturas</h2><p>Emitido em: ${dt}</p></div></div>
@@ -640,6 +640,7 @@ function imprimirRelatorio() {
   const win=window.open('','_blank','width=1150,height=780');
   if (!win) { alert('Permita pop-ups para imprimir.'); return; }
   Cloud.writeDocument(win,html); win.document.close();
+  try{ const pb=win.document.getElementById('btnImprimirRel'); if(pb) pb.addEventListener('click',function(){ win.focus(); win.print(); }); }catch(e){}
 }
 
 function exportarCsv() {
@@ -735,7 +736,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.17',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.18',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -3729,6 +3730,13 @@ function bindAll() {
       }
     });
   }
+
+  // Dashboard em abas (tela Iniciar)
+  qsa('[data-dash-tab]').forEach(function(b){ b.addEventListener('click',function(){
+    var t=b.dataset.dashTab;
+    qsa('[data-dash-tab]').forEach(function(x){ x.classList.toggle('active',x===b); });
+    qsa('.dash-pane').forEach(function(p){ p.hidden=(p.dataset.dashPane!==t); });
+  }); });
 
   // ESC fecha todos os modais
   // Comprovantes consulta — busca automática ao mudar qualquer filtro
