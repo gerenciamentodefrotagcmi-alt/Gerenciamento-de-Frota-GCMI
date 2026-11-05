@@ -27,6 +27,8 @@
       transition:all .2s;
     }
     .btn-fullscreen:hover { background:rgba(214,156,56,.15); transform:translateY(-2px); }
+    #barraSessao .versao-sessao { color:rgba(214,156,56,.72); font-size:11.5px; font-weight:700; letter-spacing:.06em; white-space:nowrap; }
+    #barraSessao .versao-sessao::before { content:"·"; margin:0 7px; opacity:.5; }
 
     /* ── Modal gráfico ── */
     #modalGraficos {
@@ -607,6 +609,9 @@
   #armGauge .arm-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 6px 6px}
   #armGauge .arm-card{display:flex;align-items:center;gap:12px;border:1.5px solid rgba(233,197,112,.55);border-radius:12px;padding:11px 14px;
     background:linear-gradient(180deg,rgba(10,22,36,.5),rgba(6,14,24,.66));box-shadow:inset 0 1px 0 rgba(255,236,172,.22),inset 0 -3px 8px rgba(0,0,0,.4),0 2px 5px rgba(0,0,0,.4)}
+  #armGauge .arm-card.arm-click{cursor:pointer;transition:border-color .15s,transform .1s,box-shadow .15s}
+  #armGauge .arm-card.arm-click:hover{border-color:rgba(233,197,112,.95);transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,236,172,.3),0 4px 12px rgba(233,197,112,.22)}
+  #armGauge .arm-card.arm-click:active{transform:translateY(0)}
   #armGauge .arm-card svg{width:34px;height:34px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
   #armGauge .arm-lab{font-size:9.5px;color:#d9c48c;text-transform:uppercase;letter-spacing:.05em;line-height:1.2;font-weight:700}
   #armGauge .arm-val{font-size:22px;color:#f3e2a0;font-weight:800;font-family:"Consolas","Courier New",monospace;margin-top:3px;text-shadow:0 1px 1px rgba(0,0,0,.6),0 0 9px rgba(233,197,112,.4)}
@@ -629,7 +634,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.17</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -763,7 +768,6 @@
           <div class="relogio-hora" id="relogioHora">00:00:00</div>
           <div class="relogio-data" id="relogioData">—</div>
         </div>
-        <button id="btnFullscreen" class="btn-fullscreen" title="Tela cheia">⛶</button>
       </header>
 
       <!-- ════════════ DASHBOARD ════════════ -->
@@ -895,7 +899,7 @@
           <div class="panel-body-scroll">
           <div class="form-grid compact-grid">
             <div class="field"><label>ID</label><input id="fId" type="number" /></div>
-            <div class="field"><label>Pesquisar em</label><select id="fCampoData"><option value="dataAbastecimento">Data do abastecimento</option><option value="dataLancamento">Data do lançamento</option></select></div>
+            <div class="field"><label>Pesquisar em</label><select id="fCampoData"><option value="dataAbastecimento">Data do abastecimento</option></select></div>
             <div class="field"><label>Período rápido</label><select id="fPeriodoTipo"><option value="">Livre</option><option value="dias">Dias</option><option value="semanas">Semanas</option><option value="meses">Meses</option><option value="anos">Anos</option></select></div>
             <div class="field"><label>Quantidade</label><input id="fPeriodoValor" type="number" min="1" step="1" placeholder="Ex.: 7" /></div>
             <div class="field"><label>Data inicial</label><input id="fDataIni" type="date" /></div>
@@ -1143,7 +1147,7 @@
       <!-- ════════════ CONFIG ════════════ -->
       <section id="config" class="screen" aria-label="Fluxo do sistema">
   <div class="support-nav" role="tablist" aria-label="Áreas de apoio">
-    <button type="button" role="tab" id="apoio-tab-backup" aria-controls="apoio-backup" aria-selected="true" tabindex="0" data-support-tab="backup">Backup e restauração</button><button type="button" role="tab" id="apoio-tab-orientacoes" aria-controls="apoio-orientacoes" aria-selected="false" tabindex="-1" data-support-tab="orientacoes">Orientações</button><button type="button" role="tab" id="apoio-tab-cessao" aria-controls="apoio-cessao" aria-selected="false" tabindex="-1" data-support-tab="cessao">Termo de cessão</button><button type="button" role="tab" id="apoio-tab-lgpd" aria-controls="apoio-lgpd" aria-selected="false" tabindex="-1" data-support-tab="lgpd">LGPD</button><button type="button" role="tab" id="apoio-tab-publicacao" aria-controls="apoio-publicacao" aria-selected="false" tabindex="-1" data-support-tab="publicacao">Publicação</button>
+    <button type="button" role="tab" id="apoio-tab-backup" aria-controls="apoio-backup" aria-selected="true" tabindex="0" data-support-tab="backup">Backup e restauração</button><button type="button" role="tab" id="apoio-tab-orientacoes" aria-controls="apoio-orientacoes" aria-selected="false" tabindex="-1" data-support-tab="orientacoes">Orientações</button><button type="button" role="tab" id="apoio-tab-cessao" aria-controls="apoio-cessao" aria-selected="false" tabindex="-1" data-support-tab="cessao">Termo de cessão</button><button type="button" role="tab" id="apoio-tab-lgpd" aria-controls="apoio-lgpd" aria-selected="false" tabindex="-1" data-support-tab="lgpd">LGPD</button><button type="button" role="tab" id="apoio-tab-publicacao" aria-controls="apoio-publicacao" aria-selected="false" tabindex="-1" data-support-tab="publicacao">Publicação</button><button type="button" role="tab" id="apoio-tab-versoes" aria-controls="apoio-versoes" aria-selected="false" tabindex="-1" data-support-tab="versoes">Histórico de versões</button>
   </div>
   <div class="support-frame">
     <article id="apoio-backup" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-backup" tabindex="0">
@@ -1155,8 +1159,8 @@
     <div class="arm-lcd"><div class="arm-dot" id="armDot"></div><div class="arm-pct" id="armPct">046%</div><div class="arm-mb" id="armMb">210 MB / 500 MB</div><div class="arm-btns"><i></i><i></i></div></div>
     <div class="arm-cards">
       <div class="arm-card"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7" ry="2.6" fill="rgba(233,197,112,.16)"/><path d="M5 5.5v13c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-13"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg><div><div class="arm-lab">Banco<br>(total)</div><div class="arm-val" id="armBanco">210 MB</div></div></div>
-      <div class="arm-card"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3" width="12" height="15" rx="1.5" fill="rgba(233,197,112,.16)"/><rect x="6.5" y="5.5" width="12" height="15" rx="1.5" fill="#0c1826"/><path d="M9 10.3h7M9 13.1h7M9 15.9h4"/><circle cx="17.4" cy="17.2" r="3.3" fill="#0c1826"/><path d="M16 17.3l1 1 1.9-2.1"/></svg><div><div class="arm-lab">Comprovantes<br>ativos</div><div class="arm-val" id="armAtivos">665</div></div></div>
-      <div class="arm-card"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="4.2" rx="1" fill="rgba(233,197,112,.16)"/><path d="M5 9.2v9.3c0 .9.7 1.6 1.6 1.6h10.8c.9 0 1.6-.7 1.6-1.6V9.2"/><path d="M9.6 12.6h4.8"/></svg><div><div class="arm-lab">Comprovantes<br>arquivados</div><div class="arm-val" id="armArq">0</div></div></div>
+      <div class="arm-card arm-click" id="armCardAtivos" title="Ver a relação de comprovantes ativos"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3" width="12" height="15" rx="1.5" fill="rgba(233,197,112,.16)"/><rect x="6.5" y="5.5" width="12" height="15" rx="1.5" fill="#0c1826"/><path d="M9 10.3h7M9 13.1h7M9 15.9h4"/><circle cx="17.4" cy="17.2" r="3.3" fill="#0c1826"/><path d="M16 17.3l1 1 1.9-2.1"/></svg><div><div class="arm-lab">Comprovantes<br>ativos</div><div class="arm-val" id="armAtivos">665</div></div></div>
+      <div class="arm-card arm-click" id="armCardArq" title="Sobre os comprovantes arquivados"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c570" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="4.2" rx="1" fill="rgba(233,197,112,.16)"/><path d="M5 9.2v9.3c0 .9.7 1.6 1.6 1.6h10.8c.9 0 1.6-.7 1.6-1.6V9.2"/><path d="M9.6 12.6h4.8"/></svg><div><div class="arm-lab">Comprovantes<br>arquivados</div><div class="arm-val" id="armArq">0</div></div></div>
     </div>
     <div class="arm-brand">GCMI · GERENCIAMENTO DE FROTA</div>
   </div>
@@ -1197,7 +1201,39 @@
       <div class="support-cards"><div class="support-card"><h4>Site do sistema</h4><p>O pacote para GitHub contém a interface e os arquivos necessários para abrir o aplicativo. Backups, comprovantes e cadastros reais não fazem parte do pacote público.</p></div><div class="support-card"><h4>Dados protegidos</h4><p>Os registros e comprovantes ficam protegidos no servidor. Somente contas autorizadas podem acessá-los. A importação de um backup é feita pela administração na aba Backup e restauração.</p></div></div>
       <p>Publicar o site não transfere automaticamente a base deste navegador para a nuvem.</p>
     </article>
-  </div><footer class="support-footer">Versão 2026.09.09.1 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+    <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
+      <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
+      <p class="status-label">Versão atual: <strong>22.17</strong> · formato da régua: <code>XX.X</code></p>
+      <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.17</span> · 04/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Medidor de armazenamento no Fluxo do sistema, com uso real do banco (Supabase).</li>
+            <li>Correção do brasão nos relatórios (imagem embarcada, sempre exibida).</li>
+            <li>Relatório de abastecimento enxugado: sem as colunas ID, Lançamento, Setor e Gerente.</li>
+            <li>Consulta e relatório fixados na <strong>data de abastecimento</strong>.</li>
+            <li>Impressão do relatório abre direto, sem o diálogo automático (botão Imprimir na própria página).</li>
+            <li>Cartões de comprovantes do medidor clicáveis (ativos → relação na Consulta).</li>
+            <li>Versão exibida no topo, ao lado do perfil; botão de tela cheia removido.</li>
+            <li>Inclusão deste histórico de versões.</li>
+          </ul>
+        </div>
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.16</span> · 09/09/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Migração da base real para o Supabase (nuvem), com acesso individual autenticado.</li>
+            <li>Publicação do sistema em GitHub Pages.</li>
+            <li>Aplicativo instalável no celular (PWA).</li>
+          </ul>
+          <p class="muted" style="margin-top:6px">Publicada à época com o rótulo de data <code>2026.09.09.1</code>, aqui reencaixada na régua.</p>
+        </div>
+        <div class="support-card">
+          <h4><span style="color:#f1c567">até 22.15</span> · 2026</h4>
+          <p>Linhagem anterior do sistema (régua 22.x): perfis de acesso, revisão GitHub/Supabase, importação segura, gráficos locais, relatórios e evoluções de interface, a partir dos protótipos de maio–julho de 2026.</p>
+        </div>
+      </div>
+    </article>
+  </div><footer class="support-footer">Versão 22.17 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

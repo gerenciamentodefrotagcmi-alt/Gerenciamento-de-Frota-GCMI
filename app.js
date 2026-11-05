@@ -590,11 +590,10 @@ function imprimirRelatorio() {
   const totV=dados.reduce((s,i)=>s+num(i.valorTotal),0);
   const dt=new Date().toLocaleString('pt-BR');
   const rows=dados.map(it=>`<tr>
-    <td>${it.id}</td><td>${formatDisplayDate(it.dataLancamento,false)}</td>
     <td>${formatDisplayDate(it.dataAbastecimento,false)}</td><td>${it.horaAbastecimento||''}</td>
-    <td>${getSetorName(it.setorId)}</td><td>${getVeiculoPrefixo(it.veiculoId)}</td>
+    <td>${getVeiculoPrefixo(it.veiculoId)}</td>
     <td>${getVehiclePlate(it.veiculoId)}</td><td>${getMotoristaName(it.motoristaId)}</td>
-    <td>${it.inspetorCoordenacao||''}</td><td>${it.gerenteAbastecimento||''}</td>
+    <td>${it.inspetorCoordenacao||''}</td>
     <td>${it.kmAtual||''}</td>
     <td>${getCombustivelName(getVeiculo(it.veiculoId)?.combustivelId||0)}</td>
     <td align="right">${num(it.qtdLitros).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
@@ -615,7 +614,10 @@ function imprimirRelatorio() {
   tbody tr:nth-child(even){background:#f4f7fb}tbody td{padding:4px;border-bottom:1px solid #e0e6f0}
   tfoot tr{background:#dce8f8;font-weight:700}tfoot td{padding:5px 4px;border-top:2px solid #0e2147}
   .foot{margin-top:12px;border-top:1px solid #ccd6eb;padding-top:7px;display:flex;justify-content:space-between;font-size:8px;color:#888}
-  @media print{@page{margin:1cm;size:A4 landscape}}</style></head><body>
+  .noprint-btn{position:fixed;top:12px;right:16px;background:#0e2147;color:#fff;border:none;padding:9px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:99}
+  .noprint-btn:hover{background:#15305f}
+  @media print{@page{margin:1cm;size:A4 landscape}.noprint-btn{display:none!important}}</style></head><body>
+  <button class="noprint-btn" onclick="window.print()">🖨 Imprimir</button>
   <div class="hdr"><img src="${BRASAO_DATAURL}" onerror="this.style.display='none'"/>
   <div><h1>Prefeitura Municipal de Ipatinga — Guarda Civil Municipal</h1>
   <h2>Relatório de Controle de Abastecimento de Viaturas</h2><p>Emitido em: ${dt}</p></div></div>
@@ -626,15 +628,15 @@ function imprimirRelatorio() {
     <div class="tot"><span>Valor total</span><strong>${brl(totV)}</strong></div>
     <div class="tot"><span>Ticket médio</span><strong>${dados.length?brl(totV/dados.length):brl(0)}</strong></div>
   </div>
-  <table><thead><tr><th>ID</th><th>Lançamento</th><th>Abastecimento</th><th>Hora</th><th>Setor</th>
-  <th>Prefixo</th><th>Placa</th><th>Motorista</th><th>Inspetor</th><th>Gerente</th>
+  <table><thead><tr><th>Abastecimento</th><th>Hora</th>
+  <th>Prefixo</th><th>Placa</th><th>Motorista</th><th>Inspetor</th>
   <th>KM</th><th>Combustível</th><th>Litros</th><th>Valor</th><th>Autorização</th></tr></thead>
   <tbody>${rows}</tbody>
-  <tfoot><tr><td colspan="12" style="text-align:right">TOTAIS →</td>
+  <tfoot><tr><td colspan="8" style="text-align:right">TOTAIS →</td>
   <td align="right">${totL.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td>
   <td align="right">${brl(totV)}</td><td></td></tr></tfoot></table>
   <div class="foot"><span>Guarda Civil Municipal de Ipatinga</span><span>${dt}</span></div>
-  <script>window.onload=function(){window.print();}<\/script></body></html>`;
+  </body></html>`;
   const win=window.open('','_blank','width=1150,height=780');
   if (!win) { alert('Permita pop-ups para imprimir.'); return; }
   Cloud.writeDocument(win,html); win.document.close();
@@ -733,7 +735,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'2026.09.09.1',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'22.17',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -3933,11 +3935,31 @@ function armSet(d){
   set('#armArq', d.anexosArquivados!=null?d.anexosArquivados:'0');
   var dot=qs('#armDot'); if(dot){var cor=pct>=90?'#e2574b':(pct>=70?'#e9b84a':'#49e06a');dot.style.background=cor;dot.style.boxShadow='0 0 7px '+cor;}
 }
+function armIrComprovantes(){
+  try{
+    if(typeof setScreen==='function') setScreen('consulta');
+    ['#fComprovantePrefixo','#fComprovantePeriodoTipo','#fComprovanteTipo','#fComprovanteNome','#fComprovanteDataIni','#fComprovanteDataFim']
+      .forEach(function(s){var el=qs(s); if(el) el.value='';});
+    if(typeof renderComprovantesConsulta==='function') renderComprovantesConsulta();
+    setTimeout(function(){
+      var sec=qs('#listaComprovantesConsulta');
+      var alvo=(sec&&sec.closest&&sec.closest('.panel'))||sec;
+      if(alvo&&alvo.scrollIntoView) alvo.scrollIntoView({behavior:'smooth',block:'start'});
+    },200);
+  }catch(e){}
+}
+function armArqAviso(){
+  var n=(qs('#armArq')&&qs('#armArq').textContent)||'0';
+  var ok=qs('#armOk');
+  if(ok) ok.textContent='Comprovantes arquivados ('+n+'): exclusões lógicas retidas no servidor — sem relação local disponível.';
+}
 var _armBound=false,_armBusy=false;
 function armInit(){
   if(_armBound) return; _armBound=true;
   armBuildScale();
   var tg=qs('#armToggle'); if(tg) tg.addEventListener('click',function(){tg.classList.toggle('on');armAtualizar();});
+  var ca=qs('#armCardAtivos'); if(ca) ca.addEventListener('click',armIrComprovantes);
+  var cq=qs('#armCardArq');    if(cq) cq.addEventListener('click',armArqAviso);
 }
 async function armAtualizar(){
   var g=qs('#armGauge'); if(!g) return;
