@@ -422,17 +422,16 @@
     /* ═══════════ Molduras delimitam a rolagem (telas sem rolagem de página) ═══════════ */
     @media (min-width:861px){
       .app-shell{ height:100vh; overflow:hidden; gap:16px !important; }
-      /* ═══ Moldura única (bezel) envolvendo toda a aplicação — estética unificada em todas as telas ═══ */
-      body.autenticado::before{ content:''; position:fixed; inset:10px; pointer-events:none; z-index:70;
-        border:1.5px solid rgba(214,156,56,.58); border-radius:26px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
-      body.autenticado #barraSessao{ top:12px; left:20px; right:20px; height:30px; padding:0 20px;
+      /* ═══ Sem moldura externa: as molduras internas (lateral + conteúdo) ocupam todo o perímetro ═══ */
+      body.autenticado::before{ content:none !important; }
+      body.autenticado #barraSessao{ top:8px; left:14px; right:14px; height:26px; padding:0 14px;
         background:transparent; z-index:71; }
-      body.autenticado .app-shell{ margin:46px 20px 20px !important; height:calc(100dvh - 66px) !important;
-        padding:14px 16px 16px !important; gap:16px !important; }
+      body.autenticado .app-shell{ margin:40px 14px 14px !important; height:calc(100dvh - 54px) !important;
+        padding:0 !important; gap:14px !important; }
       /* cabeçalho (topbar) como quadro: todos os cantos arredondados, alinhado ao topo */
-      body.autenticado .main-content{ padding-top:0 !important; padding-bottom:0 !important; }
-      /* direita alcança a mesma base da esquerda (sem sobra inferior assimétrica) */
-      body.autenticado .main-content > .screen.active{ padding-bottom:0 !important; }
+      /* molduras internas simétricas: sem paddings intermediários que recuam o conteúdo */
+      body.autenticado .main-content{ padding:0 !important; }
+      body.autenticado .main-content > .screen.active{ padding:0 !important; margin:0 !important; }
       body.autenticado .main-content > .topbar{ margin:0 !important; border-radius:20px !important; min-height:0 !important; }
       body.autenticado .main-content > .topbar::before,
       body.autenticado .main-content > .topbar::after{ border-radius:20px 0 0 20px !important; }
@@ -823,7 +822,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.6</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.7</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1470,8 +1469,15 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>23.6</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
+      <p class="status-label">Versão atual: <strong>23.7</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">23.7</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Moldura externa suprimida: as molduras internas (barra lateral, cabeçalho e conteúdo) passam a ocupar todo o perímetro da tela, com margem igual nos quatro lados — um único elemento visual, sem vão entre a moldura externa e as internas.</li>
+            <li>Simetria corrigida: removidos os paddings/margens intermediários que recuavam o conteúdo; esquerda e direita terminam exatamente na mesma base. Vale para todas as telas.</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">23.6</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1592,7 +1598,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 23.6 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 23.7 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

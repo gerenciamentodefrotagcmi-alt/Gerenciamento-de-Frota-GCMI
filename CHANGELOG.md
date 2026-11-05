@@ -6,6 +6,10 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normalizada em 05/11/2026**:
 a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
 
+## 23.7 — 05/11/2026
+- **Moldura externa suprimida**: as molduras internas (barra lateral, cabeçalho e conteúdo) passam a ocupar todo o perímetro da tela, com margem igual nos quatro lados — um único elemento visual, sem o vão que havia entre a moldura externa e as internas. Vale para todas as telas.
+- **Simetria corrigida**: removidos os paddings e margens intermediários que recuavam o conteúdo e deixavam a base desalinhada; esquerda e direita terminam exatamente na mesma base.
+
 ## 23.6 — 05/11/2026
 - **Tela Iniciar — aproveitamento do espaço**: cartões ampliados preenchendo a altura disponível (números maiores, conteúdo centralizado, sem vão interno); a tabela "Últimos abastecimentos" ganhou mais linhas visíveis.
 - **Correção da tabela "Últimos abastecimentos"**: o cabeçalho passou a ser fixo e **opaco** ao rolar — resolvido o efeito "fantasma" (linhas aparecendo sobre o cabeçalho). Vale para as demais tabelas `.table-inner`.
