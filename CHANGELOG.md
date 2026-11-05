@@ -6,6 +6,10 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normalizada em 05/11/2026**:
 a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
 
+## 23.3 — 05/11/2026
+- **Botão Imprimir** na tela de Relatórios (ao lado de "Período todo"): emite o **Relatório de Gestão da Frota** em A4 (brasão, período, consumo geral e as três tabelas — comparativo entre VTRs com % do total, por horário e por dia da semana), pronto para o comando.
+- **Chavinha "ATUALIZAR"** do medidor de armazenamento revisada: aparência **metal/bronze** e funcionamento **momentâneo** (aciona, atualiza e retorna sozinha); corrigido o deslize indevido ao passar o mouse.
+
 ## 23.2 — 05/11/2026
 - **Nova tela "Relatórios de Gestão"** (item no menu): voltada à emissão de relatórios para o comando, com objetivo de gestão e não só exibição de números.
   - **Consumo geral** do período: nº de abastecimentos, litros, valor total e preço médio do litro.

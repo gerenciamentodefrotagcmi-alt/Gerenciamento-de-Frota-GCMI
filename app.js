@@ -746,7 +746,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.2',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.3',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1607,6 +1607,80 @@ function renderRelatorios() {
   });
   const diaArr = nomesDia.map((nome,i)=>({label:nome, val:porDia[i]}));
   renderRelBars('#relBarsDia', diaArr, ' L', true);
+}
+
+// Impressão do Relatório de Gestão (consumo geral + 3 comparativos)
+function imprimirRelatorios() {
+  const dados = getRelPeriodo();
+  if (!dados.length) { alert('Nenhum dado no período para imprimir.'); return; }
+  const de = qs('#relDe')?.value || '';
+  const ate = qs('#relAte')?.value || '';
+  const periodoTxt = (de||ate)
+    ? `${de?formatDisplayDate(de,false):'início'} a ${ate?formatDisplayDate(ate,false):'hoje'}`
+    : 'Todo o período registrado';
+  const dt = new Date().toLocaleString('pt-BR');
+  const litros = dados.reduce((s,i)=>s+num(i.qtdLitros),0);
+  const valor  = dados.reduce((s,i)=>s+num(i.valorTotal),0);
+  const preco  = litros>0 ? 'R$ '+(valor/litros).toFixed(3).replace('.',',') : '—';
+
+  // VTRs
+  const porVtr={};
+  dados.forEach(a=>{ if(a.veiculoId==null||a.veiculoId==='')return; const k=a.veiculoId; (porVtr[k]=porVtr[k]||{l:0,v:0}); porVtr[k].l+=num(a.qtdLitros); porVtr[k].v+=num(a.valorTotal); });
+  const vtrArr=Object.entries(porVtr).map(([id,o])=>({nome:getVeiculoPrefixo(id),l:o.l,v:o.v})).sort((a,b)=>b.l-a.l);
+  const vtrRows=vtrArr.map((x,i)=>`<tr><td align="center">${i+1}º</td><td>${x.nome}</td><td align="right">${x.l.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td><td align="right">${brl(x.v)}</td><td align="right">${litros>0?((x.l/litros)*100).toFixed(1).replace('.',',')+'%':'-'}</td></tr>`).join('');
+
+  // Horário
+  const porHora=Array.from({length:24},()=>0);
+  dados.forEach(a=>{ const h=parseInt((a.horaAbastecimento||'').slice(0,2),10); if(h>=0&&h<24)porHora[h]+=num(a.qtdLitros); });
+  const horaRows=porHora.map((l,h)=>({h,l})).filter(x=>x.l>0).map(x=>`<tr><td>${String(x.h).padStart(2,'0')}h</td><td align="right">${x.l.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td></tr>`).join('');
+
+  // Dia da semana
+  const nomesDia=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const porDia=Array.from({length:7},()=>0);
+  dados.forEach(a=>{ const d=a.dataAbastecimento; if(!d)return; const wd=new Date(d+'T12:00:00').getDay(); if(wd>=0&&wd<7)porDia[wd]+=num(a.qtdLitros); });
+  const diaRows=nomesDia.map((nome,i)=>`<tr><td>${nome}</td><td align="right">${porDia[i].toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td></tr>`).join('');
+
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/>
+  <title>Relatório de Gestão da Frota — GCM Ipatinga</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:16px}
+  .hdr{display:flex;align-items:center;gap:14px;border-bottom:3px solid #0e2147;padding-bottom:10px;margin-bottom:12px}
+  .hdr img{height:120px;width:auto;object-fit:contain}.hdr h1{font-size:14px;color:#0e2147;text-transform:uppercase;font-weight:700}
+  .hdr h2{font-size:12px;color:#333;margin-top:2px}.hdr p{font-size:10px;color:#666;margin-top:3px}
+  .flt{background:#eef2fa;border-left:4px solid #1a3a6b;padding:6px 10px;margin-bottom:12px;font-size:10px}.flt b{color:#0e2147}
+  .tots{display:flex;gap:10px;margin-bottom:14px}
+  .tot{flex:1;border:1px solid #ccd6eb;border-top:3px solid #1a3a6b;border-radius:4px;padding:7px 9px;text-align:center}
+  .tot span{display:block;font-size:9px;color:#666;text-transform:uppercase}.tot strong{display:block;font-size:15px;color:#0e2147;margin-top:2px;font-weight:700}
+  h3{font-size:12px;color:#0e2147;text-transform:uppercase;margin:16px 0 6px;border-bottom:1px solid #ccd6eb;padding-bottom:3px}
+  table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px}
+  thead tr{background:#0e2147}thead th{padding:5px 6px;color:#fff;text-align:left;font-weight:700;text-transform:uppercase}
+  tbody tr:nth-child(even){background:#f4f7fb}tbody td{padding:4px 6px;border-bottom:1px solid #e0e6f0}
+  .cols{display:flex;gap:18px}.cols>div{flex:1}
+  .foot{margin-top:16px;border-top:1px solid #ccd6eb;padding-top:8px;display:flex;justify-content:space-between;font-size:9px;color:#888}
+  .noprint-btn{position:fixed;top:12px;right:16px;background:#0e2147;color:#fff;border:none;padding:9px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:99}
+  .noprint-btn:hover{background:#15305f}
+  @media print{@page{margin:1.2cm;size:A4 portrait}.noprint-btn{display:none!important}}</style></head><body>
+  <button class="noprint-btn" id="btnImprimirRelGestao" type="button">🖨 Imprimir</button>
+  <div class="hdr"><img src="${BRASAO_DATAURL}" onerror="this.style.display='none'"/>
+  <div><h1>Prefeitura Municipal de Ipatinga — Guarda Civil Municipal</h1>
+  <h2>Relatório de Gestão da Frota — Consumo de Combustível</h2><p>Período: ${periodoTxt} · Emitido em: ${dt}</p></div></div>
+  <div class="tots">
+    <div class="tot"><span>Abastecimentos</span><strong>${dados.length}</strong></div>
+    <div class="tot"><span>Litros</span><strong>${litros.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</strong></div>
+    <div class="tot"><span>Valor total</span><strong>${brl(valor)}</strong></div>
+    <div class="tot"><span>Preço médio/L</span><strong>${preco}</strong></div>
+  </div>
+  <h3>Comparativo entre viaturas (maior consumo)</h3>
+  <table><thead><tr><th>#</th><th>Viatura</th><th style="text-align:right">Litros</th><th style="text-align:right">Valor</th><th style="text-align:right">% do total</th></tr></thead><tbody>${vtrRows}</tbody></table>
+  <div class="cols">
+    <div><h3>Consumo por horário</h3><table><thead><tr><th>Hora</th><th style="text-align:right">Litros</th></tr></thead><tbody>${horaRows||'<tr><td colspan="2">Sem dados.</td></tr>'}</tbody></table></div>
+    <div><h3>Consumo por dia da semana</h3><table><thead><tr><th>Dia</th><th style="text-align:right">Litros</th></tr></thead><tbody>${diaRows}</tbody></table></div>
+  </div>
+  <div class="foot"><span>Guarda Civil Municipal de Ipatinga · Relatório de Gestão da Frota</span><span>${dt}</span></div>
+  </body></html>`;
+  const win=window.open('','_blank','width=1000,height=800');
+  if (!win) { alert('Permita pop-ups para imprimir.'); return; }
+  Cloud.writeDocument(win,html); win.document.close();
+  try{ const pb=win.document.getElementById('btnImprimirRelGestao'); if(pb) pb.addEventListener('click',function(){ win.focus(); win.print(); }); }catch(e){}
 }
 
 function renderAbastecimentosTable() {
@@ -4064,7 +4138,11 @@ var _armBound=false,_armBusy=false;
 function armInit(){
   if(_armBound) return; _armBound=true;
   armBuildScale();
-  var tg=qs('#armToggle'); if(tg) tg.addEventListener('click',function(){tg.classList.toggle('on');armAtualizar();});
+  var tg=qs('#armToggle'); if(tg) tg.addEventListener('click',function(){
+    if(_armBusy) return;
+    tg.classList.add('on');
+    Promise.resolve(armAtualizar()).finally(function(){ setTimeout(function(){ tg.classList.remove('on'); }, 650); });
+  });
   var ca=qs('#armCardAtivos'); if(ca) ca.addEventListener('click',armIrComprovantes);
   var cq=qs('#armCardArq');    if(cq) cq.addEventListener('click',armArqAviso);
 }
