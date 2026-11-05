@@ -4,6 +4,10 @@ Formato da régua: `XX.X` (minor de .1 a .9; depois incrementa o número cheio).
 A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
 
+## 22.20 — 05/11/2026
+- **Moldura única**: um só fio dourado contorna a tela inteira, com um divisor entre a barra lateral (brasão + botões — estática, não rola) e o conteúdo à direita (a lista, que rola).
+- **Brasão** da barra lateral ajustado para **4 cm**.
+
 ## 22.19 — 05/11/2026
 - **Consulta reorganizada**: o painel de filtros virou recolhível e as duas listas (Resultados e Comprovantes) viraram abas. Só a lista da aba ativa rola, dentro da moldura — um único rolamento, sem a página rolar. Resolve o acúmulo de rolamentos e o excesso visual.
 - **Service worker (sw.js)**: passou a buscar sempre a versão mais nova da rede (no-store). Assim, cada publicação aparece automaticamente, sem precisar limpar o cache do navegador.
