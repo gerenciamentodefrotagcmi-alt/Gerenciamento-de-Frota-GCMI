@@ -378,8 +378,21 @@
       .app-shell{ height:100vh; overflow:hidden; gap:16px !important; }
       /* esquerda: moldura COMPACTA (encolhe ao conteúdo, não estica); direita: moldura alta com a lista rolando */
       .sidebar{ overflow:hidden; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
-      .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden;
-        margin-left:0 !important; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
+      /* conceito de quadros separados: sem moldurão externo no conteúdo */
+      .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden; gap:14px;
+        margin-left:0 !important; border:0 !important; border-radius:0 !important; background:transparent !important; backdrop-filter:none !important; }
+      .main-content > .topbar{ margin:0 !important; }
+      /* quadro padrão (borda dourada fechada) */
+      .quadro{ border:1px solid rgba(214,156,56,.5); border-radius:20px; padding:12px 16px;
+        background:linear-gradient(180deg,rgba(7,18,35,.55),rgba(6,14,24,.55)); box-shadow:0 2px 10px rgba(0,0,0,.22); }
+      /* dentro do quadro de controles, o painel de filtros perde a borda própria (sem moldura dupla) */
+      .quadro-controles .consulta-filtros, .quadro-controles .panel{ border:0 !important; background:transparent !important; box-shadow:none !important; padding:0 !important; }
+      /* Consulta em quadros: controles (fixo) + dados (rola) */
+      #consulta > .quadro-controles{ flex:0 0 auto; }
+      #consulta > .quadro-data{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; gap:10px; }
+      #consulta > .quadro-data > .consulta-tabs{ flex:1 1 auto; min-height:0; }
+      .quadro-data .dash-tabs{ border:0 !important; background:transparent !important; box-shadow:none !important; }
+      .quadro-data .dash-tabbar{ padding:0 0 8px !important; }
       .main-content > .topbar{ flex:0 0 auto; }
       .main-content > .screen.active{ flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; padding-right:10px; }
       .main-content > .screen.active::-webkit-scrollbar{ width:8px; }
@@ -393,22 +406,31 @@
       #consulta .consulta-tabs > .dash-pane:not([hidden]){ display:flex; flex-direction:column; }
       #consulta .consulta-tabs .dash-scroll{ flex:1 1 auto; max-height:none; min-height:0; }
       /* Máximo aproveitamento da tela: dashboard e abastecimentos preenchem a moldura inteira */
-      #dashboard.screen.active, #abastecimentos.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; gap:14px; padding-right:0 !important; }
-      #dashboard.screen.active > *:not(.dash-tabs), #abastecimentos.screen.active > *:not(.dash-tabs){ flex:0 0 auto; }
-      #dashboard.screen.active > .dash-tabs, #abastecimentos.screen.active > .dash-tabs{ flex:1 1 auto; min-height:0; }
-      #dashboard .dash-tabs > .dash-pane:not([hidden]), #abastecimentos .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
-      #dashboard .dash-scroll, #abastecimentos .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
+      #dashboard.screen.active, #abastecimentos.screen.active, #trocaOleo.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; gap:14px; padding-right:0 !important; }
+      #dashboard.screen.active > *:not(.dash-tabs), #abastecimentos.screen.active > *:not(.dash-tabs), #trocaOleo.screen.active > *:not(.dash-tabs){ flex:0 0 auto; }
+      #dashboard.screen.active > .dash-tabs, #abastecimentos.screen.active > .dash-tabs, #trocaOleo.screen.active > .dash-tabs{ flex:1 1 auto; min-height:0; }
+      #dashboard .dash-tabs > .dash-pane:not([hidden]), #abastecimentos .dash-tabs > .dash-pane:not([hidden]), #trocaOleo .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+      #dashboard .dash-scroll, #abastecimentos .dash-scroll, #trocaOleo .dash-scroll{ flex:1 1 auto; max-height:none !important; min-height:0; }
+      /* Troca de óleo: barra de ação por aba + grade de status */
+      #trocaOleo .dash-pane-actions{ display:flex; justify-content:flex-end; margin:0 0 10px; }
+      #trocaOleo .troca-oleo-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; align-content:start; }
       /* Cadastros em abas: cada aba preenche a tela, tabela rola na caixa (sem rolar a página) */
       #cadastros.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; padding-right:0 !important; }
       #cadastros > .dash-tabs{ flex:1 1 auto; min-height:0; }
       #cadastros .dash-tabs > .dash-pane:not([hidden]){ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
       #cadastros .dash-pane > .panel{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
       #cadastros .panel .table-wrap{ flex:1 1 auto; min-height:0; max-height:none !important; }
+      /* Fluxo do sistema: abas por grupo; cada aba rola só por dentro, dentro de um quadro */
+      #config.screen.active{ overflow:hidden !important; display:flex; flex-direction:column; gap:12px; padding-right:0 !important; }
+      #config > .support-nav{ flex:0 0 auto; }
+      #config > .support-frame{ flex:1 1 auto; min-height:0; border:1px solid rgba(214,156,56,.5); border-radius:20px;
+        background:linear-gradient(180deg,rgba(7,18,35,.55),rgba(6,14,24,.55)); box-shadow:0 2px 10px rgba(0,0,0,.22); padding:14px 16px; }
+      #config .support-pane:not([hidden]){ height:100%; overflow-y:auto; padding-right:8px; }
+      #config .support-pane::-webkit-scrollbar{ width:8px; }
+      #config .support-pane::-webkit-scrollbar-thumb{ background:rgba(214,156,56,.3); border-radius:4px; }
+      #config #apoio-armazenamento{ display:flex; flex-direction:column; align-items:center; justify-content:center; }
     }
     .table-inner { width:100%; border-collapse:collapse; }
-
-    /* Histórico de trocas — altura maior */
-    #trocaOleo .panel-sticky-form:last-child { max-height:320px; }
 
     /* ═══════════ Scroll horizontal com mouse wheel ═══════════ */
     .troca-oleo-cards-horizontal { scroll-behavior:smooth; }
@@ -691,7 +713,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.22</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.23</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -828,6 +850,7 @@
 
       <!-- ════════════ DASHBOARD ════════════ -->
       <section id="dashboard" class="screen active">
+        <div class="quadro quadro-controles">
         <div class="cards-grid five" id="dashCardsRow">
           <article class="stat-card"><span>Total de abastecimentos</span><strong id="dashTotalRegistros">0</strong></article>
           <article class="stat-card"><span>Litros no período</span><strong id="dashTotalLitros">0</strong></article>
@@ -840,6 +863,7 @@
           </article>
         </div>
         <div id="dashAlertasOleo"></div>
+        </div><!-- /quadro-controles -->
         <div class="dash-tabs" id="dashTabs">
           <div class="dash-tabbar" role="tablist">
             <button type="button" class="active" data-dash-tab="ultimos">📋 Últimos abastecimentos</button>
@@ -954,6 +978,7 @@
 
       <!-- ════════════ CONSULTA ════════════ -->
       <section id="consulta" class="screen">
+        <div class="quadro quadro-controles">
         <div class="panel consulta-filtros collapsed" id="consultaFiltros">
           <div class="panel-head panel-head-sticky consulta-filtros-head" id="btnToggleFiltros" title="Mostrar/ocultar filtros"><h3>🔍 Consulta avançada</h3><span class="consulta-filtros-toggle" aria-hidden="true">▸</span></div>
           <div class="consulta-filtros-body">
@@ -985,6 +1010,8 @@
           <article class="stat-card small"><span>Litros filtrados</span><strong id="consultaLitros">0</strong></article>
           <article class="stat-card small"><span>Valor filtrado</span><strong id="consultaValor">R$ 0,00</strong></article>
         </div>
+        </div><!-- /quadro-controles -->
+        <div class="quadro quadro-data">
         <div id="consultaPeriodoInfo" class="highlight-box">Período livre.</div>
         <div class="dash-tabs consulta-tabs" id="consultaTabs">
           <div class="dash-tabbar" role="tablist">
@@ -1063,17 +1090,21 @@
           </div><!-- /dash-scroll comprovantes -->
           </div><!-- /dash-pane comprovantes -->
         </div><!-- /consulta-tabs -->
+        </div><!-- /quadro-data -->
       </section>
 
       <!-- ════════════ TROCA DE ÓLEO ════════════ -->
       <section id="trocaOleo" class="screen">
-
-        <!-- Formulário: cabeçalho travado, corpo rolável -->
-        <div class="panel panel-sticky-form">
-          <div class="panel-head panel-head-sticky">
-            <h3>Registrar Troca de Óleo</h3><span class="tag">Manutenção preventiva</span>
+        <div class="dash-tabs trocaoleo-tabs" id="trocaOleoTabs">
+          <div class="dash-tabbar" role="tablist">
+            <button type="button" class="active" data-ab-tab="registrar">🛢️ Registrar troca</button>
+            <button type="button" data-ab-tab="status">🚦 Status por veículo</button>
+            <button type="button" data-ab-tab="historico">📜 Histórico</button>
           </div>
-          <div class="panel-body-scroll">
+
+          <!-- Registrar: formulário -->
+          <div class="dash-pane" data-ab-pane="registrar">
+          <div class="dash-scroll">
             <form id="formTrocaOleo" class="form-grid compact-grid">
               <input type="hidden" id="trocaOleoId" />
               <div class="field"><label>Veículo</label><select id="trocaOleoVeiculoId" required></select></div>
@@ -1103,32 +1134,32 @@
                 <button type="button" id="btnCancelarTrocaOleo" class="btn btn-secondary">Cancelar</button>
               </div>
             </form>
-          </div>
-        </div>
+          </div><!-- /dash-scroll registrar -->
+          </div><!-- /dash-pane registrar -->
 
-        <!-- Cards: scroll horizontal sensível ao mouse -->
-        <div class="trocaoleo-cards-panel">
-          <div class="trocaoleo-cards-head">
-            <span style="font-size:13px;font-weight:700;color:#f1c567">Status por veículo</span>
-            <button class="btn btn-chart" id="btnGraficoOleo" style="padding:6px 12px;font-size:12px">📊 Gráfico</button>
-          </div>
-          <div id="trocaOleoCards" class="troca-oleo-cards-horizontal"></div>
-        </div>
+          <!-- Status: cards por veículo -->
+          <div class="dash-pane" data-ab-pane="status" hidden>
+          <div class="dash-scroll">
+            <div class="dash-pane-actions">
+              <button class="btn btn-chart" id="btnGraficoOleo" style="padding:6px 12px;font-size:12px">📊 Gráfico</button>
+            </div>
+            <div id="trocaOleoCards" class="troca-oleo-cards-grid"></div>
+          </div><!-- /dash-scroll status -->
+          </div><!-- /dash-pane status -->
 
-        <!-- Histórico: cabeçalho travado, tabela rolável -->
-        <div class="panel panel-sticky-form">
-          <div class="panel-head panel-head-sticky">
-            <h3>Histórico de trocas</h3>
-            <button class="btn btn-print" id="btnImprimirTrocaOleo" style="padding:8px 12px;font-size:13px">🖨 Imprimir</button>
-          </div>
-          <div class="panel-body-scroll">
+          <!-- Histórico: tabela -->
+          <div class="dash-pane" data-ab-pane="historico" hidden>
+          <div class="dash-scroll">
+            <div class="dash-pane-actions">
+              <button class="btn btn-print" id="btnImprimirTrocaOleo" style="padding:6px 12px;font-size:12px">🖨 Imprimir</button>
+            </div>
             <table class="table-inner">
               <thead><tr><th>ID</th><th>Veículo</th><th>Placa</th><th>Data</th><th>KM troca</th><th>Intervalo</th><th>KM próxima</th><th>Tipo óleo</th><th>Qtd.L</th><th>Valor/L</th><th>Custo total</th><th>Observação</th><th>Ações</th></tr></thead>
               <tbody id="trocaOleoTabela"></tbody>
             </table>
-          </div>
-        </div>
-
+          </div><!-- /dash-scroll historico -->
+          </div><!-- /dash-pane historico -->
+        </div><!-- /dash-tabs trocaoleo -->
       </section>
 
       <!-- ════════════ CADASTROS ════════════ -->
@@ -1214,11 +1245,11 @@
 
       <!-- ════════════ CONFIG ════════════ -->
       <section id="config" class="screen" aria-label="Fluxo do sistema">
-  <div class="support-nav" role="tablist" aria-label="Áreas de apoio">
-    <button type="button" role="tab" id="apoio-tab-backup" aria-controls="apoio-backup" aria-selected="true" tabindex="0" data-support-tab="backup">Backup e restauração</button><button type="button" role="tab" id="apoio-tab-orientacoes" aria-controls="apoio-orientacoes" aria-selected="false" tabindex="-1" data-support-tab="orientacoes">Orientações</button><button type="button" role="tab" id="apoio-tab-cessao" aria-controls="apoio-cessao" aria-selected="false" tabindex="-1" data-support-tab="cessao">Termo de cessão</button><button type="button" role="tab" id="apoio-tab-lgpd" aria-controls="apoio-lgpd" aria-selected="false" tabindex="-1" data-support-tab="lgpd">LGPD</button><button type="button" role="tab" id="apoio-tab-publicacao" aria-controls="apoio-publicacao" aria-selected="false" tabindex="-1" data-support-tab="publicacao">Publicação</button><button type="button" role="tab" id="apoio-tab-versoes" aria-controls="apoio-versoes" aria-selected="false" tabindex="-1" data-support-tab="versoes">Histórico de versões</button>
+  <div class="support-nav" role="tablist" aria-label="Áreas de apoio"><button type="button" role="tab" id="apoio-tab-armazenamento" aria-controls="apoio-armazenamento" aria-selected="true" tabindex="0" data-support-tab="armazenamento">📊 Armazenamento</button>
+    <button type="button" role="tab" id="apoio-tab-backup" aria-controls="apoio-backup" aria-selected="false" tabindex="-1" data-support-tab="backup">Backup e restauração</button><button type="button" role="tab" id="apoio-tab-orientacoes" aria-controls="apoio-orientacoes" aria-selected="false" tabindex="-1" data-support-tab="orientacoes">Orientações</button><button type="button" role="tab" id="apoio-tab-cessao" aria-controls="apoio-cessao" aria-selected="false" tabindex="-1" data-support-tab="cessao">Termo de cessão</button><button type="button" role="tab" id="apoio-tab-lgpd" aria-controls="apoio-lgpd" aria-selected="false" tabindex="-1" data-support-tab="lgpd">LGPD</button><button type="button" role="tab" id="apoio-tab-publicacao" aria-controls="apoio-publicacao" aria-selected="false" tabindex="-1" data-support-tab="publicacao">Publicação</button><button type="button" role="tab" id="apoio-tab-versoes" aria-controls="apoio-versoes" aria-selected="false" tabindex="-1" data-support-tab="versoes">Histórico de versões</button>
   </div>
   <div class="support-frame">
-    <article id="apoio-backup" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-backup" tabindex="0">
+    <article id="apoio-armazenamento" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-armazenamento" tabindex="0">
 <section id="armGauge" class="arm-panel" hidden>
   <div class="arm-top"></div><div class="arm-edge"></div>
   <div class="arm-inner">
@@ -1235,6 +1266,9 @@
   <div class="arm-toggle" id="armToggle"><div class="arm-slot"><div class="arm-knob"></div></div><div class="arm-lab2">ATUALIZAR</div></div>
 </section>
 <div class="arm-ok" id="armOk"></div>
+    </article>
+    <article id="apoio-backup" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-backup" tabindex="0" hidden>
+
 
       <div class="support-heading"><div><span class="eyebrow">SEUS DADOS</span><h3>Backup e restauração</h3></div><span class="status-label">Armazenamento autenticado</span></div>
       <p>Exporte todos os cadastros, abastecimentos, trocas de óleo e comprovantes ativos, independentemente dos filtros. Use o arquivo JSON para restaurar a base em uma conta administradora.</p>
@@ -1271,8 +1305,15 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>22.22</strong> · formato da régua: <code>XX.X</code></p>
+      <p class="status-label">Versão atual: <strong>22.23</strong> · formato da régua: <code>XX.X</code></p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.23</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Troca de óleo dividida em 3 abas (Registrar troca · Status por veículo · Histórico) — cabe numa tela, sem rolagem de página; só o conteúdo de cada aba rola dentro do quadro.</li>
+            <li>Status por veículo agora em grade que se ajusta à largura (sem rolagem lateral).</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">22.22</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1342,7 +1383,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 22.22 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 22.23 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

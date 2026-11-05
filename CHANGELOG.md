@@ -4,6 +4,10 @@ Formato da régua: `XX.X` (minor de .1 a .9; depois incrementa o número cheio).
 A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
 
+## 22.23 — 05/11/2026
+- **Troca de óleo em abas**: dividida em 3 abas (Registrar troca · Status por veículo · Histórico). Cada grupo cabe numa tela, sem rolagem de página — só o conteúdo da aba ativa rola dentro do quadro.
+- **Status por veículo** agora em grade que se ajusta à largura da tela (sem rolagem lateral de cartões).
+
 ## 22.22 — 05/11/2026
 - **Barra lateral** ocupando toda a altura da esquerda (não mais compacta), como quadro fechado.
 - **Molduras** como quadros fechados com cantos arredondados — tudo dentro do quadro.
