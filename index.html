@@ -367,17 +367,19 @@
     @media (max-height:780px){ .dash-scroll{ max-height:calc(100vh - 360px); min-height:180px; } }
     /* ═══════════ Molduras delimitam a rolagem (telas sem rolagem de página) ═══════════ */
     @media (min-width:861px){
-      .app-shell{ height:100vh; overflow:hidden; position:relative; }
-      /* fio dourado interno simétrico contornando toda a moldura */
-      .app-shell::after{ content:""; position:absolute; pointer-events:none; z-index:6;
-        inset:18px; border:1px solid rgba(214,156,56,.3); border-radius:28px; }
-      .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+      .app-shell{ height:100vh; overflow:hidden; gap:16px !important; }
+      /* barra lateral e conteúdo como molduras separadas e simétricas (com respiro) */
+      .sidebar{ border:1px solid rgba(214,156,56,.6) !important; border-right:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
+      .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden;
+        margin-left:0 !important; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
       .main-content > .topbar{ flex:0 0 auto; }
       .main-content > .screen.active{ flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; padding-right:10px; }
       .main-content > .screen.active::-webkit-scrollbar{ width:8px; }
       .main-content > .screen.active::-webkit-scrollbar-track{ background:transparent; }
       .main-content > .screen.active::-webkit-scrollbar-thumb{ background:rgba(214,156,56,.3); border-radius:4px; }
       .main-content > .screen.active::-webkit-scrollbar-thumb:hover{ background:rgba(214,156,56,.55); }
+      /* Consulta: um único rolamento (o da moldura) — painéis internos fluem */
+      #consulta .panel-body-scroll{ overflow:visible !important; max-height:none !important; }
     }
     .table-inner { width:100%; border-collapse:collapse; }
 
@@ -1246,8 +1248,8 @@
             <li>Relatório com numeração sequencial (Nº) e ordem crescente pela data de abastecimento.</li>
             <li>Tela inicial reorganizada em abas (Últimos abastecimentos · Consumo por placa e período).</li>
             <li>Tela de Abastecimentos dividida em abas (Novo abastecimento · Registros) — um único rolamento.</li>
-            <li>Todas as telas com rolagem interna à moldura — a página não rola mais (desktop).</li>
-            <li>Moldura com fio dourado interno simétrico contornando a página.</li>
+            <li>Barra lateral e conteúdo como molduras separadas e simétricas, com respiro entre elas.</li>
+            <li>Cada tela com rolagem única dentro da moldura — a página não rola (desktop); Consulta sem rolamentos aninhados.</li>
             <li>Removido o subtítulo da barra lateral.</li>
           </ul>
         </div>

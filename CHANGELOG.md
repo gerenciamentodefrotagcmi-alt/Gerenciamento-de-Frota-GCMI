@@ -10,7 +10,7 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 - **Relatório** com **numeração sequencial** (coluna Nº) e **ordem crescente pela data de abastecimento** — o item 01 é o do primeiro dia do período filtrado.
 - **Molduras delimitam a rolagem**: no desktop cada tela rola por dentro da sua moldura e a página em si não rola mais (acabamento mais refinado).
 - **Abastecimentos** dividido em abas (Novo abastecimento · Registros) — elimina os dois rolamentos e o excesso visual da lista de registros.
-- **Moldura** com fio dourado interno simétrico contornando toda a página (acabamento).
+- **Molduras separadas e simétricas**: barra lateral e conteúdo viraram dois painéis com borda dourada completa e respiro entre eles (antes ficavam colados). Consulta passou a ter rolamento único (sem rolamentos internos aninhados).
 - Removido o subtítulo "Centro institucional de gestão operacional" da barra lateral.
 
 ## 22.17 — 04/11/2026
