@@ -746,7 +746,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.3',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.4',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1587,6 +1587,23 @@ function renderRelatorios() {
     .sort((a,b)=>b.val-a.val);
   renderRelBars('#relBarsVtr', vtrArr, ' L', true);
 
+  // KM rodado e eficiência (km/L) por VTR — a mais rodada é a mais utilizada
+  const porVtrKm={};
+  dados.forEach(a=>{
+    if (a.veiculoId==null || a.veiculoId==='') return;
+    const k=a.veiculoId;
+    if (!porVtrKm[k]) porVtrKm[k]={min:Infinity,max:-Infinity,l:0};
+    const o=porVtrKm[k], km=num(a.kmAtual);
+    if (km>0) { if(km<o.min)o.min=km; if(km>o.max)o.max=km; }
+    o.l += num(a.qtdLitros);
+  });
+  const kmArr = Object.entries(porVtrKm).map(([id,o])=>{
+    const rod = (o.max>o.min && o.min!==Infinity) ? (o.max-o.min) : 0;
+    const kml = (rod>0 && o.l>0) ? rod/o.l : null;
+    return { label:getVeiculoPrefixo(id), val:rod, extra: kml!=null ? kml.toFixed(2).replace('.',',')+' km/L' : '—' };
+  }).filter(x=>x.val>0).sort((a,b)=>b.val-a.val);
+  renderRelBars('#relBarsKm', kmArr, ' km', true);
+
   // Por horário (hora do dia, cronológico)
   const porHora = Array.from({length:24},()=>0);
   dados.forEach(a=>{
@@ -1623,11 +1640,11 @@ function imprimirRelatorios() {
   const valor  = dados.reduce((s,i)=>s+num(i.valorTotal),0);
   const preco  = litros>0 ? 'R$ '+(valor/litros).toFixed(3).replace('.',',') : '—';
 
-  // VTRs
+  // VTRs — litros, valor, KM rodado (odômetro) e eficiência km/L
   const porVtr={};
-  dados.forEach(a=>{ if(a.veiculoId==null||a.veiculoId==='')return; const k=a.veiculoId; (porVtr[k]=porVtr[k]||{l:0,v:0}); porVtr[k].l+=num(a.qtdLitros); porVtr[k].v+=num(a.valorTotal); });
-  const vtrArr=Object.entries(porVtr).map(([id,o])=>({nome:getVeiculoPrefixo(id),l:o.l,v:o.v})).sort((a,b)=>b.l-a.l);
-  const vtrRows=vtrArr.map((x,i)=>`<tr><td align="center">${i+1}º</td><td>${x.nome}</td><td align="right">${x.l.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td><td align="right">${brl(x.v)}</td><td align="right">${litros>0?((x.l/litros)*100).toFixed(1).replace('.',',')+'%':'-'}</td></tr>`).join('');
+  dados.forEach(a=>{ if(a.veiculoId==null||a.veiculoId==='')return; const k=a.veiculoId; if(!porVtr[k])porVtr[k]={l:0,v:0,min:Infinity,max:-Infinity}; porVtr[k].l+=num(a.qtdLitros); porVtr[k].v+=num(a.valorTotal); const km=num(a.kmAtual); if(km>0){ if(km<porVtr[k].min)porVtr[k].min=km; if(km>porVtr[k].max)porVtr[k].max=km; } });
+  const vtrArr=Object.entries(porVtr).map(([id,o])=>{ const rod=(o.max>o.min&&o.min!==Infinity)?(o.max-o.min):0; const kml=(rod>0&&o.l>0)?rod/o.l:null; return {nome:getVeiculoPrefixo(id),l:o.l,v:o.v,rod,kml}; }).sort((a,b)=>b.l-a.l);
+  const vtrRows=vtrArr.map((x,i)=>`<tr><td align="center">${i+1}º</td><td>${x.nome}</td><td align="right">${x.l.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td><td align="right">${brl(x.v)}</td><td align="right">${x.rod>0?x.rod.toLocaleString('pt-BR')+' km':'—'}</td><td align="right">${x.kml!=null?x.kml.toFixed(2).replace('.',','):'—'}</td><td align="right">${litros>0?((x.l/litros)*100).toFixed(1).replace('.',',')+'%':'-'}</td></tr>`).join('');
 
   // Horário
   const porHora=Array.from({length:24},()=>0);
@@ -1669,8 +1686,9 @@ function imprimirRelatorios() {
     <div class="tot"><span>Valor total</span><strong>${brl(valor)}</strong></div>
     <div class="tot"><span>Preço médio/L</span><strong>${preco}</strong></div>
   </div>
-  <h3>Comparativo entre viaturas (maior consumo)</h3>
-  <table><thead><tr><th>#</th><th>Viatura</th><th style="text-align:right">Litros</th><th style="text-align:right">Valor</th><th style="text-align:right">% do total</th></tr></thead><tbody>${vtrRows}</tbody></table>
+  <h3>Viaturas — consumo, utilização (KM rodado) e eficiência (km/L)</h3>
+  <table><thead><tr><th>#</th><th>Viatura</th><th style="text-align:right">Litros</th><th style="text-align:right">Valor</th><th style="text-align:right">KM rodado</th><th style="text-align:right">km/L</th><th style="text-align:right">% litros</th></tr></thead><tbody>${vtrRows}</tbody></table>
+  <p style="font-size:9px;color:#666;margin:2px 0 0">KM rodado = maior menos menor hodômetro registrado no período; km/L = KM rodado ÷ litros (estimativa). Viaturas com um único abastecimento no período não têm KM rodado calculável.</p>
   <div class="cols">
     <div><h3>Consumo por horário</h3><table><thead><tr><th>Hora</th><th style="text-align:right">Litros</th></tr></thead><tbody>${horaRows||'<tr><td colspan="2">Sem dados.</td></tr>'}</tbody></table></div>
     <div><h3>Consumo por dia da semana</h3><table><thead><tr><th>Dia</th><th style="text-align:right">Litros</th></tr></thead><tbody>${diaRows}</tbody></table></div>

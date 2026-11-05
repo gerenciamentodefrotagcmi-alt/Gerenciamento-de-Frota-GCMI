@@ -377,6 +377,7 @@
     .rel-filtros{ display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
     .rel-filtros .field{ gap:4px; }
     .rel-filtros .field input{ min-height:40px; }
+    .rel-nota{ font-size:11.5px; color:rgba(243,232,198,.55); margin:0 2px 12px; line-height:1.4; }
     .rel-bars{ display:flex; flex-direction:column; gap:8px; }
     .rel-bar-row{ display:grid; grid-template-columns:130px 1fr 190px; align-items:center; gap:12px; font-size:13px; }
     .rel-bar-row .rb-label{ color:#f3e8c6; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -408,12 +409,19 @@
     @media (min-width:861px){
       .app-shell{ height:100vh; overflow:hidden; gap:16px !important; }
       /* ═══ Moldura única (bezel) envolvendo toda a aplicação — estética unificada em todas as telas ═══ */
-      body.autenticado::before{ content:''; position:fixed; inset:12px; pointer-events:none; z-index:70;
-        border:1.5px solid rgba(214,156,56,.58); border-radius:30px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
-      body.autenticado #barraSessao{ top:14px; left:16px; right:16px; height:40px; padding:0 26px;
+      body.autenticado::before{ content:''; position:fixed; inset:10px; pointer-events:none; z-index:70;
+        border:1.5px solid rgba(214,156,56,.58); border-radius:26px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
+      body.autenticado #barraSessao{ top:12px; left:20px; right:20px; height:30px; padding:0 20px;
         background:transparent; z-index:71; }
-      body.autenticado .app-shell{ margin:56px 16px 16px !important; height:calc(100dvh - 72px) !important;
-        padding:18px 22px 22px !important; gap:18px !important; }
+      body.autenticado .app-shell{ margin:46px 20px 20px !important; height:calc(100dvh - 66px) !important;
+        padding:14px 16px 16px !important; gap:16px !important; }
+      /* cabeçalho (topbar) como quadro: todos os cantos arredondados, alinhado ao topo */
+      body.autenticado .main-content{ padding-top:0 !important; }
+      body.autenticado .main-content > .topbar{ margin:0 !important; border-radius:20px !important; min-height:0 !important; }
+      body.autenticado .main-content > .topbar::before,
+      body.autenticado .main-content > .topbar::after{ border-radius:20px 0 0 20px !important; }
+      /* barra lateral preenche toda a altura, com folga igual até o bezel */
+      body.autenticado .sidebar{ align-self:stretch !important; margin:0 !important; }
       /* esquerda: moldura COMPACTA (encolhe ao conteúdo, não estica); direita: moldura alta com a lista rolando */
       .sidebar{ overflow:hidden; border:1px solid rgba(214,156,56,.6) !important; border-radius:26px !important; }
       /* conceito de quadros separados: sem moldurão externo no conteúdo */
@@ -779,7 +787,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.3</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.4</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1180,11 +1188,18 @@
           <div class="dash-tabs" id="relTabs">
             <div class="dash-tabbar" role="tablist">
               <button type="button" class="active" data-ab-tab="vtr">🚓 Comparativo entre VTRs</button>
+              <button type="button" data-ab-tab="km">🛣️ KM &amp; eficiência</button>
               <button type="button" data-ab-tab="hora">⏰ Por horário</button>
               <button type="button" data-ab-tab="dia">📅 Por dia da semana</button>
             </div>
             <div class="dash-pane" data-ab-pane="vtr">
               <div class="dash-scroll"><div class="rel-bars" id="relBarsVtr"></div></div>
+            </div>
+            <div class="dash-pane" data-ab-pane="km" hidden>
+              <div class="dash-scroll">
+                <p class="rel-nota">Quilometragem rodada no período (maior − menor KM do odômetro) e eficiência (km ÷ litros). A VTR no topo é a mais utilizada.</p>
+                <div class="rel-bars" id="relBarsKm"></div>
+              </div>
             </div>
             <div class="dash-pane" data-ab-pane="hora" hidden>
               <div class="dash-scroll"><div class="rel-bars" id="relBarsHora"></div></div>
@@ -1408,8 +1423,15 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>23.3</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
+      <p class="status-label">Versão atual: <strong>23.4</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">23.4</span> · 05/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Relatórios: nova aba <strong>KM &amp; eficiência</strong> — quilometragem rodada por VTR no período (maior − menor hodômetro) e <strong>km/L</strong>, ranqueando a viatura mais utilizada. KM rodado e km/L também entram na tabela do relatório impresso.</li>
+            <li>Acabamento da moldura: cabeçalho com os quatro cantos arredondados, cabeçalho e barra lateral alinhados ao topo, menos espaço até a borda superior e folga correta da barra lateral até a moldura externa.</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">23.3</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1508,7 +1530,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 23.3 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 23.4 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

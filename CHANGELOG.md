@@ -6,6 +6,10 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normalizada em 05/11/2026**:
 a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
 
+## 23.4 — 05/11/2026
+- **Relatórios — nova aba "KM & eficiência"**: quilometragem rodada por VTR no período (maior − menor hodômetro registrado) e eficiência **km/L**, ranqueando a viatura **mais utilizada** (a do topo). KM rodado e km/L também passam a constar na tabela de viaturas do **relatório impresso**.
+- **Acabamento da moldura única**: cabeçalho com os quatro cantos arredondados (antes o canto superior-esquerdo era reto); cabeçalho e barra lateral alinhados ao topo; reduzido o espaço até a borda superior; corrigida a folga da barra lateral até a moldura externa (não encosta mais).
+
 ## 23.3 — 05/11/2026
 - **Botão Imprimir** na tela de Relatórios (ao lado de "Período todo"): emite o **Relatório de Gestão da Frota** em A4 (brasão, período, consumo geral e as três tabelas — comparativo entre VTRs com % do total, por horário e por dia da semana), pronto para o comando.
 - **Chavinha "ATUALIZAR"** do medidor de armazenamento revisada: aparência **metal/bronze** e funcionamento **momentâneo** (aciona, atualiza e retorna sozinha); corrigido o deslize indevido ao passar o mouse.
