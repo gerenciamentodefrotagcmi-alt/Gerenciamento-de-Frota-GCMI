@@ -348,6 +348,34 @@
     .panel-body-scroll::-webkit-scrollbar { width:4px; }
     .panel-body-scroll::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
     .panel-body-scroll::-webkit-scrollbar-thumb { background:rgba(214,156,56,.35); border-radius:2px; }
+    /* ═══════════ Dashboard em abas (tela Iniciar sem rolagem) ═══════════ */
+    .dash-tabs { display:flex; flex-direction:column; border:1px solid rgba(214,156,56,.32); border-radius:16px;
+      background:linear-gradient(180deg,rgba(10,22,36,.45),rgba(6,14,24,.35)); overflow:hidden;
+      box-shadow:inset 0 1px 0 rgba(255,236,172,.1),0 4px 14px rgba(0,0,0,.28); }
+    .dash-tabbar { display:flex; gap:8px; flex-wrap:wrap; padding:10px 12px; border-bottom:1px solid rgba(214,156,56,.18); }
+    .dash-tabbar button { padding:8px 16px; border-radius:11px; border:1px solid rgba(214,156,56,.32);
+      background:transparent; color:#d9c48c; font-weight:700; font-size:13px; cursor:pointer; transition:all .15s; }
+    .dash-tabbar button:hover { border-color:rgba(214,156,56,.6); color:#f3e8c6; }
+    .dash-tabbar button.active { background:linear-gradient(180deg,#f1c567,#d69c38); color:#1a1200; border-color:transparent;
+      box-shadow:0 2px 8px rgba(214,156,56,.3); }
+    .dash-pane[hidden] { display:none; }
+    .dash-scroll { overflow-y:auto; max-height:calc(100vh - 430px); min-height:240px; padding:14px 18px; }
+    .dash-pane-pad { padding:16px 18px; }
+    .dash-scroll::-webkit-scrollbar { width:4px; }
+    .dash-scroll::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
+    .dash-scroll::-webkit-scrollbar-thumb { background:rgba(214,156,56,.35); border-radius:2px; }
+    @media (max-height:780px){ .dash-scroll{ max-height:calc(100vh - 360px); min-height:180px; } }
+    /* ═══════════ Molduras delimitam a rolagem (telas sem rolagem de página) ═══════════ */
+    @media (min-width:861px){
+      .app-shell{ height:100vh; overflow:hidden; }
+      .main-content{ display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+      .main-content > .topbar{ flex:0 0 auto; }
+      .main-content > .screen.active{ flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; padding-right:10px; }
+      .main-content > .screen.active::-webkit-scrollbar{ width:8px; }
+      .main-content > .screen.active::-webkit-scrollbar-track{ background:transparent; }
+      .main-content > .screen.active::-webkit-scrollbar-thumb{ background:rgba(214,156,56,.3); border-radius:4px; }
+      .main-content > .screen.active::-webkit-scrollbar-thumb:hover{ background:rgba(214,156,56,.55); }
+    }
     .table-inner { width:100%; border-collapse:collapse; }
 
     /* Histórico de trocas — altura maior */
@@ -634,7 +662,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.17</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v22.18</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -784,18 +812,20 @@
           </article>
         </div>
         <div id="dashAlertasOleo"></div>
-        <div class="cards-grid two">
-          <article class="panel panel-sticky-form">
-            <div class="panel-head panel-head-sticky"><h3>Últimos abastecimentos</h3></div>
-            <div class="panel-body-scroll" id="dashUltimosScroll">
+        <div class="dash-tabs" id="dashTabs">
+          <div class="dash-tabbar" role="tablist">
+            <button type="button" class="active" data-dash-tab="ultimos">📋 Últimos abastecimentos</button>
+            <button type="button" data-dash-tab="consumo">📊 Consumo por placa e período</button>
+          </div>
+          <div class="dash-pane" data-dash-pane="ultimos">
+            <div class="dash-scroll" id="dashUltimosScroll">
               <table class="table-inner">
                 <thead><tr><th>ID</th><th>Data</th><th>Prefixo</th><th>Placa</th><th>Motorista</th><th>Valor</th></tr></thead>
                 <tbody id="dashUltimos"></tbody>
               </table>
             </div>
-          </article>
-          <article class="panel">
-            <div class="panel-head panel-head-sticky"><h3>Consumo por placa e período</h3></div>
+          </div>
+          <div class="dash-pane dash-pane-pad" data-dash-pane="consumo" hidden>
             <div class="form-grid compact-grid">
               <div class="field"><label>Placa</label><select id="dashAggPlaca"></select></div>
               <div class="field"><label>Período</label>
@@ -814,7 +844,7 @@
             </div>
             <div class="actions-row"><button class="btn btn-primary" id="btnCalcularDash">Calcular</button></div>
             <div id="dashAggResultado" class="highlight-box">Selecione placa, período e quantidade.</div>
-          </article>
+          </div>
         </div>
       </section>
 
@@ -1203,8 +1233,17 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>22.17</strong> · formato da régua: <code>XX.X</code></p>
+      <p class="status-label">Versão atual: <strong>22.18</strong> · formato da régua: <code>XX.X</code></p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">22.18</span> · 04/11/2026</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li>Correção do botão Imprimir do relatório (passou a imprimir ao clicar).</li>
+            <li>Relatório com numeração sequencial (Nº) e ordem crescente pela data de abastecimento.</li>
+            <li>Tela inicial reorganizada em abas (Últimos abastecimentos · Consumo por placa e período).</li>
+            <li>Todas as telas com rolagem interna à moldura — a página não rola mais (desktop).</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">22.17</span> · 04/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1233,7 +1272,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 22.17 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 22.18 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

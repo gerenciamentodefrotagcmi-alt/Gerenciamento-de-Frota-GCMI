@@ -7,6 +7,8 @@ set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.1
 ## 22.18 — 04/11/2026
 - Correção do **botão Imprimir** do relatório: o `onclick` inline era removido pelo DOMPurify (`writeDocument`); agora o clique é ligado a partir da janela-mãe pelo `id`, e a impressão funciona.
 - **Tela inicial** reorganizada em **abas** ("Últimos abastecimentos" e "Consumo por placa e período"), com a área da tabela limitada à altura da tela (rolagem interna) — a página deixa de rolar e a tela fica menos carregada.
+- **Relatório** com **numeração sequencial** (coluna Nº) e **ordem crescente pela data de abastecimento** — o item 01 é o do primeiro dia do período filtrado.
+- **Molduras delimitam a rolagem**: no desktop cada tela rola por dentro da sua moldura e a página em si não rola mais (acabamento mais refinado).
 
 ## 22.17 — 04/11/2026
 - Medidor de armazenamento no Fluxo do sistema, com uso real do banco via Supabase

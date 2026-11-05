@@ -584,12 +584,20 @@ function buildFiltrosResumo(f) {
 }
 
 function imprimirRelatorio() {
-  const f=getConsultaFilters(), dados=getFilteredAbastecimentos(f);
+  const f=getConsultaFilters();
+  const dados=getFilteredAbastecimentos(f).slice().sort((a,b)=>{
+    const da=a.dataAbastecimento||'', db=b.dataAbastecimento||'';
+    if(da!==db) return da<db?-1:1;
+    const ha=a.horaAbastecimento||'', hb=b.horaAbastecimento||'';
+    if(ha!==hb) return ha<hb?-1:1;
+    return (a.id||0)-(b.id||0);
+  });
   if (!dados.length) { alert('Nenhum registro para imprimir.'); return; }
   const totL=dados.reduce((s,i)=>s+num(i.qtdLitros),0);
   const totV=dados.reduce((s,i)=>s+num(i.valorTotal),0);
   const dt=new Date().toLocaleString('pt-BR');
-  const rows=dados.map(it=>`<tr>
+  const rows=dados.map((it,i)=>`<tr>
+    <td align="center">${String(i+1).padStart(2,'0')}</td>
     <td>${formatDisplayDate(it.dataAbastecimento,false)}</td><td>${it.horaAbastecimento||''}</td>
     <td>${getVeiculoPrefixo(it.veiculoId)}</td>
     <td>${getVehiclePlate(it.veiculoId)}</td><td>${getMotoristaName(it.motoristaId)}</td>
@@ -628,11 +636,11 @@ function imprimirRelatorio() {
     <div class="tot"><span>Valor total</span><strong>${brl(totV)}</strong></div>
     <div class="tot"><span>Ticket médio</span><strong>${dados.length?brl(totV/dados.length):brl(0)}</strong></div>
   </div>
-  <table><thead><tr><th>Abastecimento</th><th>Hora</th>
+  <table><thead><tr><th>Nº</th><th>Abastecimento</th><th>Hora</th>
   <th>Prefixo</th><th>Placa</th><th>Motorista</th><th>Inspetor</th>
   <th>KM</th><th>Combustível</th><th>Litros</th><th>Valor</th><th>Autorização</th></tr></thead>
   <tbody>${rows}</tbody>
-  <tfoot><tr><td colspan="8" style="text-align:right">TOTAIS →</td>
+  <tfoot><tr><td colspan="9" style="text-align:right">TOTAIS →</td>
   <td align="right">${totL.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td>
   <td align="right">${brl(totV)}</td><td></td></tr></tfoot></table>
   <div class="foot"><span>Guarda Civil Municipal de Ipatinga</span><span>${dt}</span></div>
