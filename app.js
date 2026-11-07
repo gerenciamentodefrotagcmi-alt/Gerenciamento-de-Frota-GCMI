@@ -205,11 +205,38 @@ let _saveQueue = Promise.resolve();
 let storageReady = false;
 
 function backupStateLocally() { /* Dados pessoais não são persistidos no navegador. */ }
+// Reverte o estado em memória ao último snapshot CONFIRMADO pelo servidor.
+// remoteSnapshot é mantido por db-remoto.js e só muda após gravação bem-sucedida;
+// assim a tela nunca passa a exibir, como salvo, algo que o servidor recusou. [C1]
+function rollbackToConfirmed(){
+ try{ if(typeof remoteSnapshot==='string' && remoteSnapshot) state=migrateState(JSON.parse(remoteSnapshot)); }catch(_){}
+}
+// Conflito de revisão (40001): outro usuário gravou antes. Em vez de forçar novo login
+// (que descartaria o que o operador digitou), re-sincroniza o estado atual do servidor,
+// re-renderiza a tela e mantém o formulário para nova tentativa. [A1]
+async function resyncOnConflict(){
+ const dados=await dbLoadState();                 // atualiza remoteRevision e remoteSnapshot
+ state=migrateState(clone(dados));
+ if(typeof renderAll==='function') renderAll();
+}
 async function saveState() {
  if(!storageReady)throw new Error('Aguarde o carregamento da base.');
  const snapshot=clone(state);
- _saveQueue=_saveQueue.then(()=>dbSaveState(snapshot));
- try{await _saveQueue;}catch(e){Cloud.fail(e);throw e;}
+ // A fila serializa as gravações. O .catch() garante que a continuação da fila
+ // nunca carregue uma rejeição — uma falha isolada não envenena as próximas. [C2]
+ const attempt=_saveQueue.then(()=>dbSaveState(snapshot));
+ _saveQueue=attempt.catch(()=>{});
+ try{await attempt;}
+ catch(e){
+  if(e&&e.code==='40001'){ // conflito: re-sincroniza sem derrubar a sessão nem o formulário
+   try{
+    await resyncOnConflict();
+    alert('A base foi atualizada por outro usuário. A tela foi recarregada e o que você digitou foi preservado — confira os dados e clique em salvar novamente.');
+   }catch(err){ rollbackToConfirmed(); Cloud.fail(err); }
+   throw e;
+  }
+  rollbackToConfirmed(); Cloud.fail(e); throw e;
+ }
 }
 async function saveStateSync(){return saveState();}
 function nextId(col) { return Math.max(0,...state[col].map(i=>Number(i.id)||0))+1; }
@@ -746,7 +773,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.8',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.9',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1560,7 +1587,7 @@ function renderRelBars(sel, items, unit, markPeak) {
   el.innerHTML = vis.map(i=>{
     const clk = (i.vid!=null && i.vid!=='');
     const cls = 'rel-bar-row'+(markPeak&&i.val===max?' peak':'')+(clk?' clickable':'');
-    const attr = clk ? ` onclick="abrirTimelineVtr('${i.vid}')" title="Ver linha do tempo de abastecimentos"` : '';
+    const attr = clk ? ` onclick="abrirTimelineVtr(${i.vid})" title="Ver linha do tempo de abastecimentos"` : '';
     return `<div class="${cls}"${attr}>
     <span class="rb-label">${i.label}</span>
     <div class="rel-bar-track"><div class="rel-bar-fill" style="width:${Math.max(2,(i.val/max)*100)}%"></div></div>

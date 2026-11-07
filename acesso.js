@@ -4,7 +4,7 @@ window.Cloud = (()=>{
   const q=s=>document.querySelector(s);
   const status=t=>q('#acessoStatus').textContent=t;
   const memory=new Map();
-  const allowedHandler=/^(?:(?:abrirModalComprovantes|abrirModalTrocaOleo|abrirSubGraficoPizzaVtr|excluirComprovante|excluirComprovanteConsulta|excluirComprovanteModal|imprimirComprovanteAbastecimento|moverTipo|removerTipo|toggleTodosVtr|toggleVtr|visualizarComprovante|visualizarComprovanteAbastecimento|visualizarComprovanteModal)\((?:-?\d+(?:,-?\d+)*)?\)|fecharSplashCard\(\);abrirModalAbastecimento\(\d+\)|fecharModalAlertasVencidos\(\);setScreen\('trocaOleo'\))$/;
+  const allowedHandler=/^(?:(?:abrirModalComprovantes|abrirModalTrocaOleo|abrirSubGraficoPizzaVtr|abrirTimelineVtr|excluirComprovante|excluirComprovanteConsulta|excluirComprovanteModal|imprimirComprovanteAbastecimento|moverTipo|removerTipo|toggleTodosVtr|toggleVtr|visualizarComprovante|visualizarComprovanteAbastecimento|visualizarComprovanteModal)\((?:-?\d+(?:,-?\d+)*)?\)|fecharSplashCard\(\);abrirModalAbastecimento\(\d+\)|fecharModalAlertasVencidos\(\);setScreen\('trocaOleo'\))$/;
   // Os templates antigos usam alguns eventos inline numéricos. Só esses comandos
   // conhecidos são conservados; textos de cadastros não podem criar código executável.
   DOMPurify.addHook('uponSanitizeAttribute',(_node,data)=>{
@@ -29,7 +29,7 @@ window.Cloud = (()=>{
     if(writing){busy++;q('#gravandoNuvem').hidden=false;}
     try{
       const {data,error}=await client.rpc(name,args);
-      if(error){if(error.code==='42501' && !closing) await logout('Sua sessão ou permissão não é mais válida.');throw new Error(error.message||'Operação não concluída.');}
+      if(error){if(error.code==='42501' && !closing) await logout('Sua sessão ou permissão não é mais válida.');const e=new Error(error.message||'Operação não concluída.');e.code=error.code;throw e;}
       return data;
     }finally{if(writing){busy--;const el=q('#gravandoNuvem');if(el)el.hidden=busy===0;}}
   }
@@ -87,7 +87,9 @@ window.Cloud = (()=>{
     if(Date.now()-lastActivity>15*60*1000){await logout('Sessão encerrada após 15 minutos sem atividade.');return;}
     if(lastActivity>lastPing&&Date.now()-lastPing>60000){lastPing=Date.now();try{const p=await rpc('gcm_sessao');if(p!==perfil)await logout('Permissões alteradas. Entre novamente.');}catch(e){if(!closing)fail(e);}}
   },1000);
-  window.addEventListener('unhandledrejection',e=>{e.preventDefault();fail(e.reason);});
+  // Conflito de revisão (40001) é tratado no fluxo de gravação (re-sincroniza e preserva
+  // o formulário); não deve acionar o banner bloqueante de "entrar novamente". [A1]
+  window.addEventListener('unhandledrejection',e=>{e.preventDefault();if(e.reason&&e.reason.code==='40001')return;fail(e.reason);});
   q('#formAcesso').addEventListener('submit',login);
   q('#sairSessao').addEventListener('click',()=>logout());
   q('#recarregarNuvem').addEventListener('click',()=>logout('Entre novamente para carregar a versão atual dos dados.'));

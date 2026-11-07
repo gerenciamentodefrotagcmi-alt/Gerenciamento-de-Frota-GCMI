@@ -823,7 +823,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.8</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v23.9</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1470,8 +1470,17 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>23.8</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
+      <p class="status-label">Versão atual: <strong>23.9</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">23.9</span> · 05/11/2026 · confiabilidade dos registros</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li><strong>Gravação à prova de falha:</strong> quando o servidor não confirma uma operação (conflito ou queda de conexão), a tela não mostra mais, como salvo, algo que não foi gravado — o estado é revertido ao último confirmado e o aviso orienta a recarregar. Nenhuma exclusão ou alteração "fantasma" permanece na tela.</li>
+            <li><strong>Fila de gravação blindada:</strong> uma falha isolada deixava de travar todas as gravações seguintes da sessão; agora cada gravação é independente e o sistema se recupera sozinho do erro.</li>
+            <li><strong>Linha do tempo por VTR reativada:</strong> o clique nas barras dos Relatórios voltou a abrir a linha do tempo de abastecimentos da viatura (o comando vinha sendo descartado pela camada de segurança da interface).</li>
+            <li><strong>Conflito de edição sem perda de trabalho:</strong> quando outro usuário grava antes, a tela agora é recarregada automaticamente com os dados atuais e o formulário é preservado — basta conferir e salvar de novo, sem precisar entrar novamente.</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">23.8</span> · 05/11/2026</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1605,7 +1614,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 23.8 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 23.9 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>
