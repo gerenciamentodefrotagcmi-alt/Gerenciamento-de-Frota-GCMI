@@ -4,7 +4,7 @@ window.Cloud = (()=>{
   const q=s=>document.querySelector(s);
   const status=t=>q('#acessoStatus').textContent=t;
   const memory=new Map();
-  const allowedHandler=/^(?:(?:abrirModalComprovantes|abrirModalTrocaOleo|abrirSubGraficoPizzaVtr|abrirTimelineVtr|excluirComprovante|excluirComprovanteConsulta|excluirComprovanteModal|imprimirComprovanteAbastecimento|moverTipo|removerTipo|toggleTodosVtr|toggleVtr|visualizarComprovante|visualizarComprovanteAbastecimento|visualizarComprovanteModal)\((?:-?\d+(?:,-?\d+)*)?\)|fecharSplashCard\(\);abrirModalAbastecimento\(\d+\)|fecharModalAlertasVencidos\(\);setScreen\('trocaOleo'\))$/;
+  const allowedHandler=/^(?:(?:abrirModalAbastecimento|abrirModalComprovantes|abrirModalTrocaOleo|abrirSubGraficoPizzaVtr|abrirTimelineVtr|excluirComprovante|excluirComprovanteConsulta|excluirComprovanteModal|imprimirComprovanteAbastecimento|moverTipo|removerTipo|toggleTodosVtr|toggleVtr|visualizarComprovante|visualizarComprovanteAbastecimento|visualizarComprovanteModal)\((?:-?\d+(?:,-?\d+)*)?\)|fecharSplashCard\(\);abrirModalAbastecimento\(\d+\)|fecharModalAlertasVencidos\(\);setScreen\('trocaOleo'\))$/;
   // Os templates antigos usam alguns eventos inline numéricos. Só esses comandos
   // conhecidos são conservados; textos de cadastros não podem criar código executável.
   DOMPurify.addHook('uponSanitizeAttribute',(_node,data)=>{

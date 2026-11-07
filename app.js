@@ -518,6 +518,7 @@ async function deleteAbastecimento(id) {
   await saveStateSync();
   dbExcluirComprovantesAbast(Number(id)).catch(e=>{Cloud.fail(e);throw e;});
   renderAll();
+  if(_timelineVid!=null && qs('#modalTimeline')?.classList.contains('open')) abrirTimelineVtr(_timelineVid);
 }
 
 async function clearAllLancamentos() {
@@ -773,7 +774,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'23.9',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'25',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1554,7 +1555,7 @@ function renderDashboard() {
   if(motEl) motEl.textContent = motoristas30||'-';
 
   const latest=[...state.abastecimentos].sort((a,b)=>b.id-a.id);
-  qs('#dashUltimos').innerHTML=latest.length?latest.map(it=>`<tr>
+  qs('#dashUltimos').innerHTML=latest.length?latest.map(it=>`<tr class="row-click" onclick="abrirModalAbastecimento(${it.id})" title="Ver detalhes do abastecimento">
     <td>${it.id}</td><td>${formatDisplayDate(it.dataAbastecimento)}</td>
     <td>${getVeiculoPrefixo(it.veiculoId)}</td><td>${getVehiclePlate(it.veiculoId)}</td>
     <td>${getMotoristaName(it.motoristaId)}</td><td>${brl(it.valorTotal)}</td>
@@ -1659,7 +1660,9 @@ function renderRelatorios() {
 }
 
 // Linha do tempo de abastecimentos de uma VTR (respeita o período do relatório)
+let _timelineVid=null;
 function abrirTimelineVtr(vid) {
+  _timelineVid=vid;
   const dados = getRelPeriodo()
     .filter(a=>String(a.veiculoId)===String(vid))
     .sort((a,b)=>{
@@ -1669,6 +1672,10 @@ function abrirTimelineVtr(vid) {
     });
   const prefixo=getVeiculoPrefixo(vid), placa=getVehiclePlate(vid);
   if(qs('#tlTitulo')) qs('#tlTitulo').textContent='Linha do tempo — '+prefixo+(placa?' · '+placa:'');
+  // Período a que os dados se referem (mesmo filtro dos Relatórios)
+  const _de=qs('#relDe')?.value||'', _ate=qs('#relAte')?.value||'';
+  const _periodoTxt=(_de||_ate)?((_de?formatDisplayDate(_de,false):'início')+' a '+(_ate?formatDisplayDate(_ate,false):'hoje')):'Todo o período registrado';
+  if(qs('#tlPeriodo')) qs('#tlPeriodo').textContent='Período: '+_periodoTxt;
 
   const litros=dados.reduce((s,i)=>s+num(i.qtdLitros),0);
   const valor=dados.reduce((s,i)=>s+num(i.valorTotal),0);
@@ -1682,7 +1689,8 @@ function abrirTimelineVtr(vid) {
     <div class="tl-card"><span>Eficiência</span><strong>${kml!=null?kml.toFixed(2).replace('.',',')+' km/L':'—'}</strong></div>`;
 
   let prevKm=null;
-  if(qs('#tlList')) qs('#tlList').innerHTML = dados.length ? dados.map(a=>{
+  const _tot=dados.length;
+  if(qs('#tlList')) qs('#tlList').innerHTML = dados.length ? dados.map((a,idx)=>{
     const km=num(a.kmAtual);
     let trecho='';
     if(prevKm!=null && km>0){
@@ -1692,16 +1700,78 @@ function abrirTimelineVtr(vid) {
         : `<span class="tl-alert">⚠ KM retrocedeu ${Math.abs(d).toLocaleString('pt-BR')} km</span>`;
     }
     if(km>0) prevKm=km;
-    return `<div class="tl-item"><div class="tl-dot"></div>
-      <div class="tl-date">${formatDisplayDate(a.dataAbastecimento,false)}${a.horaAbastecimento?' · '+a.horaAbastecimento:''}</div>
+    return `<div class="tl-item row-click" onclick="abrirModalAbastecimento(${a.id})" title="Ver detalhes do abastecimento">
+      <div class="tl-dot"></div>
+      <div class="tl-date"><span class="tl-num">${idx+1}/${_tot}</span> ${formatDisplayDate(a.dataAbastecimento,false)}${a.horaAbastecimento?' · '+a.horaAbastecimento:''}</div>
       <div class="tl-meta">${num(a.qtdLitros).toLocaleString('pt-BR')} L · ${brl(a.valorTotal)} · KM ${km>0?km.toLocaleString('pt-BR'):'—'}${a.motoristaId?' · '+getMotoristaName(a.motoristaId):''}</div>
       ${trecho?`<div class="tl-trecho">${trecho}</div>`:''}
     </div>`;
   }).join('') : '<p style="opacity:.5;font-size:13px">Sem abastecimentos no período para esta viatura.</p>';
 
+  // Lista grande flui em duas colunas (aproveita o espaço horizontal da tela cheia)
+  const _list=qs('#tlList'); if(_list) _list.classList.toggle('tl-cols', dados.length>8);
+
   const m=qs('#modalTimeline'); if(m) m.classList.add('open');
 }
 function fecharTimeline(){ const m=qs('#modalTimeline'); if(m) m.classList.remove('open'); }
+
+// Relatório impresso da linha do tempo da VTR — numerado, zebrado, com resumo no topo.
+function imprimirTimelineVtr(){
+  if(_timelineVid==null){ alert('Abra a linha do tempo de uma viatura primeiro.'); return; }
+  const vid=_timelineVid;
+  const dados = getRelPeriodo().filter(a=>String(a.veiculoId)===String(vid))
+    .sort((a,b)=>{ const da=(a.dataAbastecimento||'')+(a.horaAbastecimento||''), db=(b.dataAbastecimento||'')+(b.horaAbastecimento||''); if(da!==db)return da<db?-1:1; return (a.id||0)-(b.id||0); });
+  if(!dados.length){ alert('Sem abastecimentos no período para esta viatura.'); return; }
+  const prefixo=getVeiculoPrefixo(vid), placa=getVehiclePlate(vid);
+  const de=qs('#relDe')?.value||'', ate=qs('#relAte')?.value||'';
+  const periodoTxt=(de||ate)?`${de?formatDisplayDate(de,false):'início'} a ${ate?formatDisplayDate(ate,false):'hoje'}`:'Todo o período registrado';
+  const dt=new Date().toLocaleString('pt-BR');
+  const litros=dados.reduce((s,i)=>s+num(i.qtdLitros),0);
+  const valor=dados.reduce((s,i)=>s+num(i.valorTotal),0);
+  const kms=dados.map(a=>num(a.kmAtual)).filter(k=>k>0);
+  const rod=kms.length>1?(Math.max(...kms)-Math.min(...kms)):0;
+  const kml=(rod>0&&litros>0)?(rod/litros):null;
+  let prevKm=null;
+  const rows=dados.map((a,idx)=>{
+    const km=num(a.kmAtual); let trecho='—';
+    if(prevKm!=null&&km>0){ const d=km-prevKm; trecho = d>=0 ? '+'+d.toLocaleString('pt-BR')+' km' : '⚠ -'+Math.abs(d).toLocaleString('pt-BR')+' km'; }
+    if(km>0) prevKm=km;
+    return `<tr><td align="center">${idx+1}</td><td>${formatDisplayDate(a.dataAbastecimento,false)}</td><td align="center">${a.horaAbastecimento||'-'}</td><td align="right">${num(a.qtdLitros).toLocaleString('pt-BR',{minimumFractionDigits:2})} L</td><td align="right">${brl(a.valorTotal)}</td><td align="right">${km>0?km.toLocaleString('pt-BR'):'—'}</td><td align="right">${trecho}</td><td>${a.motoristaId?getMotoristaName(a.motoristaId):'-'}</td></tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/>
+  <title>Linha do tempo — ${prefixo}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:16px}
+  .hdr{display:flex;align-items:center;gap:14px;border-bottom:3px solid #0e2147;padding-bottom:10px;margin-bottom:12px}
+  .hdr img{height:120px;width:auto;object-fit:contain}.hdr h1{font-size:14px;color:#0e2147;text-transform:uppercase;font-weight:700}
+  .hdr h2{font-size:12px;color:#333;margin-top:2px}.hdr p{font-size:10px;color:#666;margin-top:3px}
+  .tots{display:flex;gap:10px;margin-bottom:14px}
+  .tot{flex:1;border:1px solid #ccd6eb;border-top:3px solid #1a3a6b;border-radius:4px;padding:7px 9px;text-align:center}
+  .tot span{display:block;font-size:9px;color:#666;text-transform:uppercase}.tot strong{display:block;font-size:15px;color:#0e2147;margin-top:2px;font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px}
+  thead tr{background:#0e2147}thead th{padding:5px 6px;color:#fff;text-align:left;font-weight:700;text-transform:uppercase}
+  tbody tr:nth-child(even){background:#f4f7fb}tbody td{padding:4px 6px;border-bottom:1px solid #e0e6f0}
+  .foot{margin-top:16px;border-top:1px solid #ccd6eb;padding-top:8px;display:flex;justify-content:space-between;font-size:9px;color:#888}
+  .noprint-btn{position:fixed;top:12px;right:16px;background:#0e2147;color:#fff;border:none;padding:9px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:99}
+  .noprint-btn:hover{background:#15305f}
+  @media print{@page{margin:1.2cm;size:A4 portrait}.noprint-btn{display:none!important}}</style></head><body>
+  <button class="noprint-btn" id="btnImprimirTimeline" type="button">🖨 Imprimir</button>
+  <div class="hdr"><img src="${BRASAO_DATAURL}" onerror="this.style.display='none'"/>
+  <div><h1>Prefeitura Municipal de Ipatinga — Guarda Civil Municipal</h1>
+  <h2>Linha do tempo de abastecimentos — ${prefixo}${placa?' · '+placa:''}</h2><p>Período: ${periodoTxt} · Emitido em: ${dt}</p></div></div>
+  <div class="tots">
+    <div class="tot"><span>Abastecimentos</span><strong>${dados.length}</strong></div>
+    <div class="tot"><span>KM rodado</span><strong>${rod>0?rod.toLocaleString('pt-BR')+' km':'—'}</strong></div>
+    <div class="tot"><span>Litros</span><strong>${litros.toLocaleString('pt-BR',{minimumFractionDigits:2})} L</strong></div>
+    <div class="tot"><span>Eficiência</span><strong>${kml!=null?kml.toFixed(2).replace('.',',')+' km/L':'—'}</strong></div>
+  </div>
+  <table><thead><tr><th>Nº</th><th>Data</th><th>Hora</th><th style="text-align:right">Litros</th><th style="text-align:right">Valor</th><th style="text-align:right">KM</th><th style="text-align:right">KM desde ant.</th><th>Motorista</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="foot"><span>Guarda Civil Municipal de Ipatinga · Linha do tempo da frota</span><span>${dt}</span></div>
+  </body></html>`;
+  const win=window.open('','_blank','width=1000,height=800');
+  if(!win){ alert('Permita pop-ups para imprimir.'); return; }
+  Cloud.writeDocument(win,html); win.document.close();
+  try{ const pb=win.document.getElementById('btnImprimirTimeline'); if(pb) pb.addEventListener('click',function(){ win.focus(); win.print(); }); }catch(e){}
+}
 
 // Impressão do Relatório de Gestão (consumo geral + 3 comparativos)
 function imprimirRelatorios() {
@@ -2444,6 +2514,19 @@ function abrirComprovantesDesdModal() {
   const id = _modalAbastId;
   fecharModalAbastecimento();
   if (id) abrirModalComprovantes(id);
+}
+
+// v25 — editar/excluir a partir do modal de detalhes (aberto ao clicar numa linha)
+function editarDesdeModal(){
+  const id = _modalAbastId;
+  fecharModalAbastecimento(); fecharTimeline();
+  if (id!=null) editAbastecimento(id);
+}
+function excluirDesdeModal(){
+  const id = _modalAbastId;
+  if (id==null) return;
+  fecharModalAbastecimento();
+  deleteAbastecimento(id); // já pede confirmação e exige perfil administrador
 }
 
 function imprimirModalAbastecimento() {
@@ -3813,6 +3896,9 @@ function imprimirSplashCard() {
 function bindAll() {
   // Menu
   qsa('.menu-item').forEach(b=>b.addEventListener('click',()=>setScreen(b.dataset.screen)));
+
+  // v25 — filtro de período aplica automaticamente ao escolher a data (sem botão "Aplicar")
+  ['#relDe','#relAte'].forEach(s=>{ const el=qs(s); if(el) el.addEventListener('change',()=>renderRelatorios()); });
 
   // Delegação de ações em tabelas
   document.body.addEventListener('click', e=>{

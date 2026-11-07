@@ -5,6 +5,17 @@ A régua foi retomada do ponto em que havia parado (22.15); a publicação de
 set/2026, que saiu com rótulo de data `2026.09.09.1`, foi reencaixada como 22.16.
 Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normalizada em 05/11/2026**:
 a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
+Obs.: após a 23.9, a numeração **24 foi pulada propositalmente** (decisão do responsável) — a régua seguiu direto para a **25**.
+
+## 25 — 07/11/2026 (navegação e relatório da linha do tempo)
+- **Linhas de abastecimento clicáveis**: na tela Iniciar ("Últimos abastecimentos") e na linha do tempo por VTR, clicar numa linha abre o **painel de detalhes** do abastecimento. O painel ganhou os botões **Editar**, **Excluir** (com confirmação e restrito ao administrador) e **Imprimir**, além dos comprovantes. Handler `abrirModalAbastecimento` incluído na lista branca do sanitizador (`acesso.js`).
+- **Linha do tempo em tela cheia**: o modal da linha do tempo por VTR passou a ocupar quase toda a janela (antes desperdiçava espaço), com rolagem interna da lista.
+- **Numeração sequencial**: cada abastecimento da linha do tempo exibe seu número de ordem no total (ex.: 3/112).
+- **Relatório da linha do tempo (botão Imprimir relatório)**: emite, em A4, o histórico de abastecimentos da viatura no período — **numerado**, em **lista zebrada**, com o resumo no topo (abastecimentos, KM rodado, litros, km/L) e a coluna "KM desde o anterior". Impressão ligada por `id` a partir da janela (o sanitizador remove onclick inline), no mesmo padrão do Relatório de Gestão.
+- **Linha do tempo em 2 colunas**: a lista passou a aproveitar o espaço horizontal, fluindo em duas (ou mais) colunas quando é grande, em vez de deixar a direita vazia.
+- **Período no cabeçalho da linha do tempo**: além das datas em cada item, o cabeçalho mostra o período a que os dados se referem (ex.: "Período: 01/10/2026 a 31/10/2026" ou "Todo o período registrado").
+- **Relatórios — filtro automático**: ao escolher a data (De/Até), o filtro é **aplicado sozinho**; o botão "Aplicar período" foi removido. O botão "Período todo" continua para limpar o filtro de uma vez.
+- Observação de régua: a versão **24 foi pulada propositalmente**; esta publicação é a **25**.
 
 ## 23.9 — 05/11/2026 (confiabilidade dos registros — resposta à auditoria técnica)
 - **C1 — Gravação à prova de falha (rollback do estado)**: quando o servidor não confirma uma operação (conflito de revisão ou queda de conexão), o estado em memória passa a ser **revertido ao último snapshot confirmado** (`rollbackToConfirmed()` em `app.js`, usando o `remoteSnapshot` mantido por `db-remoto.js`). A tela deixa de exibir, como se estivesse salvo, algo que o servidor recusou — nenhuma exclusão ou alteração "fantasma" permanece. O aviso de falha continua orientando a recarregar antes de prosseguir.
