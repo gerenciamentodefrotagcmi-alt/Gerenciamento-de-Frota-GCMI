@@ -831,7 +831,7 @@
  <button class="btn btn-primary" id="entrar" type="submit">Entrar</button></form>
  <p id="acessoStatus" role="status" aria-live="polite"></p><p>O acesso é concedido pela administração. Não há cadastro público.</p><button type="button" class="btn btn-secondary" id="esqueciSenha">Esqueci minha senha</button><details class="ajuda-acesso"><summary>Como funcionam os níveis de acesso?</summary><p><strong>Administrador:</strong> cadastros, lançamentos, importação, exportação, permissões e auditoria.</p><p><strong>Operador:</strong> lançamentos, troca de óleo, quilometragem, comprovantes, consultas e exportação. Sem exclusões, importação ou gestão de contas.</p><p><strong>Consulta:</strong> leitura, relatórios e exportação. Sem alteração dos dados.</p><p>Recuperar a senha não altera o perfil e não desbloqueia uma conta. Procure a administração para rever permissões.</p></details></div>
 </section>
-<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v25</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
+<div id="barraSessao"><span id="identidadeSessao"></span><span id="versaoSessao" class="versao-sessao">v25.1</span><button id="administrarAcesso" hidden>Acessos e auditoria</button><button id="sairSessao">Sair</button></div>
 <div id="gravandoNuvem" hidden role="status">Confirmando a operação no servidor…</div>
 <section id="falhaNuvem" hidden role="alert"><h2>Operação não confirmada</h2><p id="falhaMensagem"></p><button id="recarregarNuvem">Entrar novamente e recarregar</button></section>
 <section id="gestaoAcesso" hidden aria-label="Acessos e auditoria"><button id="fecharGestao">Voltar ao sistema</button><h2>Acessos e auditoria</h2>
@@ -1141,8 +1141,8 @@
             <table class="table-inner">
               <thead>
                 <tr>
-                  <th></th><th>ID</th><th>Lançamento</th><th>Abastecimento</th><th>Hora</th>
-                  <th>Setor</th><th>Prefixo</th><th>Placa</th><th>Motorista</th>
+                  <th></th><th>ID</th><th>Abastecimento</th><th>Hora</th>
+                  <th>Prefixo</th><th>Placa</th><th>Motorista</th>
                   <th>KM</th><th>Litros</th><th>Valor</th>
                 </tr>
               </thead>
@@ -1477,8 +1477,15 @@
     </article>
     <article id="apoio-versoes" class="support-pane" role="tabpanel" aria-labelledby="apoio-tab-versoes" tabindex="0" hidden>
       <span class="eyebrow">REGISTRO DE EVOLUÇÃO</span><h3>Histórico de versões</h3>
-      <p class="status-label">Versão atual: <strong>25</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
+      <p class="status-label">Versão atual: <strong>25.1</strong> · formato da régua: <code>XX.X</code> (minor .1 a .9; depois incrementa o número cheio)</p>
       <div class="support-cards" style="grid-template-columns:1fr">
+        <div class="support-card">
+          <h4><span style="color:#f1c567">25.1</span> · 07/11/2026 · exclusão com comprovante e enxugamento da Consulta</h4>
+          <ul style="margin:6px 0 0 18px;line-height:1.6">
+            <li><strong>Excluir lançamento com comprovante:</strong> em vez de bloquear, o sistema avisa que há comprovante e oferece <strong>arquivá-lo e excluir num passo só</strong> (com justificativa, só administrador). O comprovante é arquivado — preservado no servidor para auditoria, nunca apagado de fato.</li>
+            <li><strong>Consulta mais enxuta:</strong> removidas as colunas <strong>Lançamento</strong> e <strong>Setor</strong> da tabela de resultados.</li>
+          </ul>
+        </div>
         <div class="support-card">
           <h4><span style="color:#f1c567">25</span> · 07/11/2026 · navegação e relatório da linha do tempo</h4>
           <ul style="margin:6px 0 0 18px;line-height:1.6">
@@ -1629,7 +1636,7 @@
         </div>
       </div>
     </article>
-  </div><footer class="support-footer">Versão 25 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
+  </div><footer class="support-footer">Versão 25.1 · Desenvolvido por Adilson Dias Gomes · Guarda Municipal de Ipatinga</footer>
 </section>
     <div hidden><button id="btnLimparLancamentos"></button><button id="btnResetDemo"></button></div></main>
   </div>

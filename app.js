@@ -509,14 +509,29 @@ function editAbastecimento(id) {
 
 async function deleteAbastecimento(id) {
   Cloud.mutationAllowed(true);
-  if (!confirm('Excluir este abastecimento?')) return;
+  // Comprovantes ativos deste lançamento. O servidor não permite excluir um lançamento
+  // com comprovante ativo (evita comprovante órfão). Em vez de bloquear, oferecemos
+  // arquivar o(s) comprovante(s) e excluir num passo só. [v25.1]
+  let comps=[];
+  try{ comps=(await metadata()).filter(x=>Number(x.abastecimentoId)===Number(id)); }
+  catch(e){ Cloud.fail(e); return; }
+  let motivo=null;
+  if (comps.length){
+    if(!confirm(`Este lançamento tem ${comps.length} comprovante(s). Para excluí-lo, o(s) comprovante(s) serão ARQUIVADOS — exclusão lógica: somem da tela, mas ficam preservados no servidor para auditoria (não são apagados de fato). Deseja continuar?`)) return;
+    motivo=prompt('Justifique a exclusão do lançamento e o arquivamento do(s) comprovante(s) (mínimo 10 caracteres):');
+    if(motivo===null) return;
+    if(String(motivo).trim().length<10){ alert('A justificativa deve ter no mínimo 10 caracteres.'); return; }
+  } else {
+    if(!confirm('Excluir este abastecimento?')) return;
+  }
   const abast = findById('abastecimentos', id);
   const veiculoId = abast?.veiculoId;
+  // Arquiva os comprovantes ANTES de remover o lançamento (senão o servidor recusa a gravação).
+  try{ for(const c of comps){ await Cloud.rpc('gcm_arquivar_anexo',{p_id:Number(c.id),p_motivo:motivo}); } }
+  catch(e){ Cloud.fail(e); renderAll(); return; }
   state.abastecimentos = state.abastecimentos.filter(i=>Number(i.id)!==Number(id));
-  // Recalcula KM do veículo após exclusão para não manter valor fantasma
   if (veiculoId) recalcVeiculoKm(veiculoId);
   await saveStateSync();
-  dbExcluirComprovantesAbast(Number(id)).catch(e=>{Cloud.fail(e);throw e;});
   renderAll();
   if(_timelineVid!=null && qs('#modalTimeline')?.classList.contains('open')) abrirTimelineVtr(_timelineVid);
 }
@@ -774,7 +789,7 @@ async function buildBackupBlob(snapshot, keys, readDoc) {
     } else parts.push(JSON.stringify(value));
   }
   if(!first)parts.push(',');
-  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'25',escopo:'cadastros-lancamentos-comprovantes-ativos',
+  parts.push('"_meta":'+JSON.stringify({sistema:'Gerenciamento de Abastecimento GCMI',versao:'25.1',escopo:'cadastros-lancamentos-comprovantes-ativos',
     exportadoEm:new Date().toISOString(),totalComprovantes:keys.length})+',"_comprovantes":[');
   for(let i=0;i<keys.length;i++) {
     const doc=await readDoc(keys[i]);
@@ -1912,17 +1927,15 @@ function renderConsulta() {
     <tr data-cid="${it.id}">
       <td><button class="icon-btn expand" data-action="expand-consulta" data-id="${it.id}">▶</button></td>
       <td>${it.id}</td>
-      <td>${formatDisplayDate(it.dataLancamento)}</td>
       <td>${formatDisplayDate(it.dataAbastecimento)}</td>
       <td>${it.horaAbastecimento}</td>
-      <td>${getSetorName(it.setorId)}</td>
       <td>${getVeiculoPrefixo(it.veiculoId)}</td>
       <td>${getVehiclePlate(it.veiculoId)}</td>
       <td>${getMotoristaName(it.motoristaId)}</td>
       <td>${it.kmAtual}</td>
       <td>${num(it.qtdLitros).toLocaleString('pt-BR')}</td>
       <td>${brl(it.valorTotal)}</td>
-    </tr>`).join(''):`<tr><td colspan="12">Nenhum registro encontrado.</td></tr>`;
+    </tr>`).join(''):`<tr><td colspan="10">Nenhum registro encontrado.</td></tr>`;
 }
 
 function toggleConsultaDetail(id) {

@@ -7,6 +7,10 @@ Obs.: a linha 22.x acabou passando de .9 (22.16…22.24). A régua foi **normali
 a linha 22 foi encerrada e a numeração retomada em **23.1** (daqui em diante, .1 a .9 e depois o número cheio).
 Obs.: após a 23.9, a numeração **24 foi pulada propositalmente** (decisão do responsável) — a régua seguiu direto para a **25**.
 
+## 25.1 — 07/11/2026 (exclusão com comprovante e enxugamento da Consulta)
+- **Exclusão de lançamento com comprovante**: o servidor impede excluir um lançamento que ainda tenha comprovante ativo (para não deixar comprovante órfão). Antes isso caía num banner bloqueante de "entrar novamente"; agora o próprio botão Excluir **detecta o comprovante, avisa e oferece arquivar + excluir num passo só**, pedindo uma justificativa (mínimo 10 caracteres). O comprovante é **arquivado** (exclusão lógica: some da tela, mas fica preservado no servidor para auditoria — nunca é apagado de fato). Restrito ao administrador. Implementado em `deleteAbastecimento` (app.js) usando `metadata()` + `gcm_arquivar_anexo`.
+- **Consulta — tabela de resultados enxuta**: removidas as colunas **Lançamento** (data de lançamento) e **Setor**, que não interessavam nessa visão (thead em index.html e linhas em `renderConsulta`; colspan do "sem resultados" ajustado de 12 para 10).
+
 ## 25 — 07/11/2026 (navegação e relatório da linha do tempo)
 - **Linhas de abastecimento clicáveis**: na tela Iniciar ("Últimos abastecimentos") e na linha do tempo por VTR, clicar numa linha abre o **painel de detalhes** do abastecimento. O painel ganhou os botões **Editar**, **Excluir** (com confirmação e restrito ao administrador) e **Imprimir**, além dos comprovantes. Handler `abrirModalAbastecimento` incluído na lista branca do sanitizador (`acesso.js`).
 - **Linha do tempo em tela cheia**: o modal da linha do tempo por VTR passou a ocupar quase toda a janela (antes desperdiçava espaço), com rolagem interna da lista.
